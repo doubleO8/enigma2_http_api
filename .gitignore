@@ -1,0 +1,10 @@
+/.idea/
+*~
+*.pyc
+
+/MANIFEST
+/dist/
+
+/*.egg-info
+
+/doc/build/

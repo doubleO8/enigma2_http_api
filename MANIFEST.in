@@ -1,0 +1,2 @@
+include versioneer.py
+include enigma2_http_api/_version.py
