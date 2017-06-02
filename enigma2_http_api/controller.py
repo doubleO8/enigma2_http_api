@@ -202,9 +202,13 @@ class Enigma2APIController(BlacklistController):
         self.movielist = res['movies']
 
         for item in self.movielist:
-            pseudo_id = pseudo_unique_id(item)
-            self.movielist_map[pseudo_id] = item
-
+            try:
+                pseudo_id = pseudo_unique_id(item)
+                self.movielist_map[pseudo_id] = item
+            except AssertionError, aexc:
+                self.log.warning('%s',
+                    "Cannot generate Pseudo ID for {!r}".format(
+                        item))
             # self.log.info(pprint.pformat(self.movielist_map))
 
     def get_services(self):
