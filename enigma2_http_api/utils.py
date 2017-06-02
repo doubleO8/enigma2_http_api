@@ -215,8 +215,9 @@ def pseudo_unique_id(item):
     The ID is based on the item's title and description attribute.
     Neither title nor description may be empty.
 
-    :param item:
-    :return:
+    :param item: event, movie or timer
+    :return: generated pseudo ID
+    :rtype: str
 
     >>> pseudo_unique_id({'event': 1})
     Traceback (most recent call last):
