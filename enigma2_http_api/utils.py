@@ -3,6 +3,7 @@
 import os
 import datetime
 import hashlib
+import re
 
 # https://wiki.neutrino-hd.de/wiki/Enigma:Services:Formatbeschreibung
 # Dezimalwert: 1=TV, 2=Radio, 4=NVod, andere=Daten
@@ -42,6 +43,9 @@ LISTING_ITEM_KEY_PAIRS = [
     ('eventname', 'description'),
 ]
 
+# sondern Magnums Leben in Gefahr... 47 Min.
+PATTERN_RUNLENGTH = r'\s\d+\sMin\.'
+RE_RUNLENGTH = re.compile(PATTERN_RUNLENGTH)
 
 def normalise_servicereference(serviceref):
     """
@@ -239,6 +243,14 @@ def pseudo_unique_id(item):
     '7a6615ef8ca6b06ac6a837741293759d3083a49c'
     >>> pseudo_unique_id({'name': "x", 'descriptionextended': 'bla'})
     '7a6615ef8ca6b06ac6a837741293759d3083a49c'
+    >>> pseudo_unique_id({'name': "x", 'descriptionextended': ' 17 Min.'})
+    Traceback (most recent call last):
+        ...
+    AssertionError: desc_mangled may not be empty
+    >>> pseudo_unique_id({'name': "x", 'descriptionextended': 'Bla Bla 17 Min.'})
+    '4db3822ad252366e57d9515b1e37d3449a45a0cb'
+    >>> pseudo_unique_id({'name': "x", 'descriptionextended': 'Bla Bla 18 Min.'})
+    '4db3822ad252366e57d9515b1e37d3449a45a0cb'
     """
 
     (name, desc) = None, None
@@ -255,9 +267,14 @@ def pseudo_unique_id(item):
     if '' in (name.strip(), desc.strip()):
         raise AssertionError("name or desc may not be empty")
 
+    desc_mangled = re.sub(RE_RUNLENGTH, '', desc)
+
+    if not desc_mangled.strip():
+        raise AssertionError("desc_mangled may not be empty")
+
     m = hashlib.sha1()
     m.update(name.encode("utf-8"))
-    m.update(desc.encode("utf-8"))
+    m.update(desc_mangled.encode("utf-8"))
     return m.hexdigest()
 
 
