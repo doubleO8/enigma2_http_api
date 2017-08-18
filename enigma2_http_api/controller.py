@@ -9,6 +9,7 @@ import codecs
 import requests
 
 from utils import pseudo_unique_id
+from model import EEvent
 
 #: enigma2 web interface URL format string
 ENIGMA2_URL_FMT = '{scheme}://{remote_addr}/{path}'
@@ -114,6 +115,8 @@ class Enigma2APIController(BlacklistController):
         self.dry_run = kwargs.get("dry_run", False)
         self.dump_requests = kwargs.get("dump_requests")
         self._request_no = 0
+        self.timezone = kwargs.get("timezone")
+
         if self.dump_requests:
             self.log.info(
                 "{!r} will contain request dump files".format(
@@ -207,9 +210,9 @@ class Enigma2APIController(BlacklistController):
                 self.movielist_map[pseudo_id] = item
             except AssertionError, aexc:
                 self.log.warning('%s',
-                    "Cannot generate Pseudo ID for {!r}".format(
-                        item))
-            # self.log.info(pprint.pformat(self.movielist_map))
+                                 "Cannot generate Pseudo ID for {!r}".format(
+                                     item))
+                # self.log.info(pprint.pformat(self.movielist_map))
 
     def get_services(self):
         """
@@ -312,7 +315,7 @@ class Enigma2APIController(BlacklistController):
 
         :return:
         """
-        return self._apicall('timerlist', filter_key='timers')
+        return [EEvent(x, timezone=self.timezone) for x in self._apicall('timerlist', filter_key='timers')]
 
     def get_timeradd(self, service_ref, params):
         """
@@ -371,7 +374,7 @@ class Enigma2APIController(BlacklistController):
         }
         res = self._apicall('epgsearch', params=params, filter_key='events')
         if filter_func is not None:
-            return list(filter_func(res))
+            return [EEvent(x, timezone=self.timezone) for x in filter_func(res)]
         return res
 
     def get_zap(self, service_ref):
@@ -459,6 +462,7 @@ class Enigma2APIController(BlacklistController):
             return ''
 
         return self._apicall('messageanswer', params=params)
+
 
 if __name__ == '__main__':
     import sys

@@ -11,6 +11,7 @@ import pytz
 
 from enigma2_http_api.controller import Enigma2APIController
 from enigma2_http_api.utils import pseudo_unique_id
+from enigma2_http_api.model import EEvent
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -25,42 +26,26 @@ class TimerLister(Enigma2APIController):
         self.args = kwargs.get("cli_args")
 
     def list(self):
-        timerlist = self.get_timerlist()
-        LOCALTIMEZONE = pytz.timezone(self.args.local_timezone)
-
-        dt_keys = ['begin', 'end', 'startprepare', 'realbegin', 'realend']
-        for item in timerlist:
-            for key in dt_keys:
-                tkey = '{:s}_dt'.format(key)
-                try:
-                    dt_obj = datetime.datetime.fromtimestamp(item[key])
-                    if dt_obj.tzinfo is None:
-                        dt_obj = LOCALTIMEZONE.localize(dt_obj)
-                    item[tkey] = dt_obj
-                except TypeError:
-                    pass
-
-            try:
-                eit = int(item.get("eit", -1))
-            except Exception:
-                eit = 0
+        for item in self.get_timerlist():
+            if self.args.verbose > 2:
+                print repr(item)
 
             print '#{eit:06d} {servicename:50s} {begin_dt} -- {end_dt}'.format(
-                servicename=item['servicename'],
-                begin_dt=item['begin_dt'].strftime('%d.%m.%Y %H:%M'),
-                end_dt=item['end_dt'].strftime('%H:%M'),
-                eit=eit
+                servicename=item.service_name,
+                begin_dt=item.start_time.strftime('%d.%m.%Y %H:%M'),
+                end_dt=item.stop_time.strftime('%H:%M'),
+                eit=item.item_id
             )
-            print u'{name}'.format(name=item['name'])
+            print u'{name}'.format(name=item.title)
             print u'{description:50s} ({duration}s) PSEUDO_ID={pseudo_id}'.format(
-                description=item['description'],
-                duration=item['duration'],
+                description=item.shortinfo,
+                duration=item.duration.seconds,
                 pseudo_id=pseudo_unique_id(item)
             )
             print " "
 
             if self.args.verbose > 0:
-                print u'{descriptionextended}'.format(**item)
+                print u'{descriptionextended}'.format(descriptionextended=item.longinfo)
 
             if self.args.verbose > 1:
                 query_params = {
@@ -73,7 +58,7 @@ class TimerLister(Enigma2APIController):
                     query=urllib.urlencode(query_params))
                 print("delete URL: {:s}".format(del_url))
 
-            if self.args.verbose > 2:
+            if self.args.verbose > 3:
                 pprint.pprint(item)
 
             print " "
