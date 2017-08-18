@@ -3,16 +3,20 @@
 """
 Model classes and constants.
 """
-import pprint
 import datetime
 
 import pytz
 
 from utils import parse_servicereference, create_servicereference
 
+#: default/fallback value for local timezone
+#: as the enigma2 API returns localised timestamps (not UTC!) one need to set
+#: the correct timezone or the results will not match the values shown on
+#: the enigma2 device.
 DEFAULT_LOCALTIMEZONE = "Europe/Berlin"
 
-# '25.08.2017 00:10'
+#: datetime format as used for *realbegin*/*realend* key/value pairs of timer
+#: items returned by enigma2 API
 DT_FORMAT__REAL__KEYS = '%d.%m.%Y %H:%M'
 
 ID = 1
@@ -25,8 +29,6 @@ SHORTINFO = 7
 LONGINFO = 8
 TITLE = 9
 
-# ETSI EN 300 707 V1.2.1 (2002-12)
-# ETSI ETR 288 TECHNICAL October 1996
 _METAMAP_ATTRIBUTES = {
     'item_id': ID,
     'service_name': SERVICE_NAME,
@@ -45,7 +47,10 @@ for k, v in _METAMAP_ATTRIBUTES.items():
     if v is not None:
         _METAMAP_ATTR_REV[v] = k
 
+#: type identifier for timer items
 ITEM_TYPE_TIMER = 'timer'
+
+#: type identifier for EPG items
 ITEM_TYPE_EPG = 'epg'
 
 _META_MAP = {
@@ -75,6 +80,20 @@ _META_MAP = {
 
 
 class EEvent(dict):
+    """
+    This is a thin wrapper class to allow unified access to event items' data.
+
+    As the data keys for EPG and timer events (returned by the enigma2 API)
+    are different for the same data values the data is exposed as attributes
+    common to all item types.
+
+    Attribute names are inspired by names used in the ETSI EPG specification
+    documents.
+
+        #. ETSI EN 300 707 V1.2.1 (2002-12)
+        #. ETSI ETR 288 TECHNICAL October 1996
+
+    """
     def __init__(self, *args, **kwargs):
         """
         Container class for timer or EPG items providing unified access to the
