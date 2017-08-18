@@ -1,24 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Model classes and constants.
+"""
 import pprint
 import datetime
 
 import pytz
+
+from utils import parse_servicereference, create_servicereference
 
 DEFAULT_LOCALTIMEZONE = "Europe/Berlin"
 
 # '25.08.2017 00:10'
 DT_FORMAT__REAL__KEYS = '%d.%m.%Y %H:%M'
 
-ID = 'ID'
-BEGIN_TIMESTAMP = 'BEGIN_TIMESTAMP'
-END_TIMESTAMP = 'END_TIMESTAMP'
-DURATION = 'DURATION'
-SERVICE_NAME = 'SERVICE_NAME'
-SERVICE_REFERENCE = 'SERVICE_REFERENCE'
-DESCRIPTION = 'DESCRIPTION'
-DESCRIPTION_EXTENDED = 'DESCRIPTION_EXTENDED'
-TITLE = 'LABEL'
+ID = 1
+START_TIMESTAMP = 2
+STOP_TIMESTAMP = 3
+DURATION = 4
+SERVICE_NAME = 5
+SERVICE_REFERENCE = 6
+SHORTINFO = 7
+LONGINFO = 8
+TITLE = 9
 
 # ETSI EN 300 707 V1.2.1 (2002-12)
 # ETSI ETR 288 TECHNICAL October 1996
@@ -27,15 +32,13 @@ _METAMAP_ATTRIBUTES = {
     'service_name': SERVICE_NAME,
     'service_reference': SERVICE_REFERENCE,
     'title': TITLE,
-    'shortinfo': DESCRIPTION,
-    'longinfo': DESCRIPTION_EXTENDED,
-    # 'start_time': None,
-    # 'stop_time': None,
+    'shortinfo': SHORTINFO,
+    'longinfo': LONGINFO,
 }
 
 _METAMAP_ATTR_REV = {
-    BEGIN_TIMESTAMP: 'start_time',
-    END_TIMESTAMP: 'stop_time',
+    START_TIMESTAMP: 'start_time',
+    STOP_TIMESTAMP: 'stop_time',
 }
 
 for k, v in _METAMAP_ATTRIBUTES.items():
@@ -49,30 +52,60 @@ _META_MAP = {
     ITEM_TYPE_TIMER: {
         ID: 'eit',
         TITLE: 'name',
-        BEGIN_TIMESTAMP: 'begin',
-        END_TIMESTAMP: 'end',
+        START_TIMESTAMP: 'begin',
+        STOP_TIMESTAMP: 'end',
         DURATION: None,
         SERVICE_NAME: 'servicename',
         SERVICE_REFERENCE: 'serviceref',
-        DESCRIPTION: 'description',
-        DESCRIPTION_EXTENDED: 'descriptionextended',
+        SHORTINFO: 'description',
+        LONGINFO: 'descriptionextended',
     },
     ITEM_TYPE_EPG: {
         ID: 'id',
         TITLE: 'title',
-        BEGIN_TIMESTAMP: 'begin_timestamp',
-        END_TIMESTAMP: None,
+        START_TIMESTAMP: 'begin_timestamp',
+        STOP_TIMESTAMP: None,
         DURATION: 'duration_sec',
         SERVICE_NAME: 'sname',
         SERVICE_REFERENCE: 'sref',
-        DESCRIPTION: 'shortdesc',
-        DESCRIPTION_EXTENDED: 'longdesc',
+        SHORTINFO: 'shortdesc',
+        LONGINFO: 'longdesc',
     }
 }
 
 
 class EEvent(dict):
     def __init__(self, *args, **kwargs):
+        """
+        Container class for timer or EPG items providing unified access to the
+        data.
+        Original data is exposed by `__getitem__()` access,
+        mangled data is available through attributes.
+
+        :param args:
+        :param kwargs:
+        :return:
+
+        >>> from example_data import example_epg, example_timer, expected
+        >>> epg_d = EEvent(example_epg)
+        >>> timer_d = EEvent(example_timer)
+        >>> epg_d.title == expected['title']
+        True
+        >>> timer_d.title == expected['title']
+        True
+        >>> epg_d.shortinfo == expected['shortinfo']
+        True
+        >>> timer_d.shortinfo == expected['shortinfo']
+        True
+        >>> epg_d.item_id == expected['item_id']
+        True
+        >>> timer_d.item_id == expected['item_id']
+        True
+        >>> epg_d.service_reference == expected['service_reference']
+        True
+        >>> timer_d.service_reference == expected['service_reference']
+        True
+        """
         dict.__init__(self, *args, **kwargs)
         if kwargs.get("timezone") is None:
             self.timezone = pytz.timezone(DEFAULT_LOCALTIMEZONE)
@@ -102,9 +135,9 @@ class EEvent(dict):
             value = self.get(attr_map[key])
             setattr(self, name, value)
 
-        dt_keys = [BEGIN_TIMESTAMP]
+        dt_keys = [START_TIMESTAMP]
         if self._type == ITEM_TYPE_TIMER:
-            dt_keys.append(END_TIMESTAMP)
+            dt_keys.append(STOP_TIMESTAMP)
 
         for dt_key in dt_keys:
             data_key = attr_map[dt_key]
@@ -112,12 +145,16 @@ class EEvent(dict):
                     self._localized_dt(self[data_key]))
 
         if self._type == ITEM_TYPE_EPG:
-            self.duration = datetime.timedelta(seconds=self[attr_map[DURATION]])
+            self.duration = datetime.timedelta(
+                seconds=self[attr_map[DURATION]])
             self.stop_time = self.start_time + self.duration
         elif self._type == ITEM_TYPE_TIMER:
             self.duration = self.stop_time - self.start_time
         else:
             raise ValueError("Unsupported type {!r}".format(self._type))
+
+        self.service_reference = create_servicereference(
+            parse_servicereference(self.service_reference))
 
     def __str__(self):
         return '[{:s}#{:d}] {:s} {:s}{:s}'.format(
@@ -136,19 +173,7 @@ class EEvent(dict):
 
 
 if __name__ == '__main__':
-    from example_data import example_epg, example_timer
+    import doctest
 
-    epg_d = EEvent(example_epg)
-    timer_d = EEvent(example_timer)
-
-    victims = [epg_d, timer_d]
-    for victim in victims:
-        print victim
-        print repr(victim)
-        print victim.title
-        print victim.shortinfo
-        print victim.start_time
-        print victim.stop_time
-        print victim.duration
-        print victim.service_name, victim.service_reference
-        # pprint.pprint(victim)
+    (FAILED, SUCCEEDED) = doctest.testmod()
+    print("[doctest] SUCCEEDED/FAILED: {:d}/{:d}".format(SUCCEEDED, FAILED))

@@ -47,6 +47,7 @@ LISTING_ITEM_KEY_PAIRS = [
 PATTERN_RUNLENGTH = r'\s\d+\sMin\.'
 RE_RUNLENGTH = re.compile(PATTERN_RUNLENGTH)
 
+
 def normalise_servicereference(serviceref):
     """
     Create a normalised representation of *serviceref* to be used e.g. as
@@ -352,4 +353,4 @@ if __name__ == '__main__':
     import doctest
 
     (FAILED, SUCCEEDED) = doctest.testmod()
-    print "[doctest] SUCCEEDED/FAILED: %d/%d" % (SUCCEEDED, FAILED)
+    print("[doctest] SUCCEEDED/FAILED: {:d}/{:d}".format(SUCCEEDED, FAILED))

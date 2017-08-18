@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 example_epg = {
     'begin_timestamp': 1503612900,
     'duration_sec': 3300,
@@ -28,4 +29,12 @@ example_timer = {
 
     'servicename': 'zdf_neo',
     'serviceref': '1:0:1:6D6E:437:66:FFFF0000:0:0:0:'
+}
+
+expected = {
+    'title': 'Orange is the New Black',
+    'shortinfo': 'Muss ich wirklich dazwischen?',
+    'item_id': 22997,
+    'service_name': 'zdf_neo',
+    'service_reference': '1:0:1:6d6e:437:66:ffff0000:0:0:0:'
 }
