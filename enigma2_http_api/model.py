@@ -29,8 +29,8 @@ _METAMAP_ATTRIBUTES = {
     'title': TITLE,
     'shortinfo': DESCRIPTION,
     'longinfo': DESCRIPTION_EXTENDED,
-    #'start_time': None,
-    #'stop_time': None,
+    # 'start_time': None,
+    # 'stop_time': None,
 }
 
 _METAMAP_ATTR_REV = {
@@ -74,7 +74,10 @@ _META_MAP = {
 class EEvent(dict):
     def __init__(self, *args, **kwargs):
         dict.__init__(self, *args, **kwargs)
-        self.timezone = kwargs.get("timezone", pytz.timezone(DEFAULT_LOCALTIMEZONE))
+        if kwargs.get("timezone") is None:
+            self.timezone = pytz.timezone(DEFAULT_LOCALTIMEZONE)
+        else:
+            self.timezone = kwargs.get("timezone")
         self._init_attributes()
 
     def _localized_dt(self, value):
@@ -131,8 +134,10 @@ class EEvent(dict):
             self.item_id, self.start_time.strftime('%Y-%m-%d %H:%M %z %Z'),
             self.title, self.shortinfo)
 
+
 if __name__ == '__main__':
     from example_data import example_epg, example_timer
+
     epg_d = EEvent(example_epg)
     timer_d = EEvent(example_timer)
 
