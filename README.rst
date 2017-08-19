@@ -7,5 +7,5 @@ Using the library may help controlling enigma2 based STBs either from the enigma
 Documentation
 -------------
 
-The latest online documentation is available `here <http://enigma2-http-api.readthedocs.io/en/latest/>`.
+The latest online documentation is available `here <http://enigma2-http-api.readthedocs.io/en/latest/>`_.
 
