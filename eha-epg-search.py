@@ -74,25 +74,12 @@ class EPGSearch(Enigma2APIController):
 
     def filter_search_results(self, data):
         for item in data:
-            psref = parse_servicereference(item['sref'])
-            if self.args.verbose > 2:
+            if self.args.verbose > 9:
                 pprint.pprint(item)
 
             del item['picon']
-            LOCALTIMEZONE = pytz.timezone(self.args.local_timezone)
 
-            dt_keys = ['begin_timestamp']
-            for key in dt_keys:
-                tkey = '{:s}_dt'.format(key)
-                try:
-                    dt_obj = datetime.datetime.fromtimestamp(item[key])
-                    if dt_obj.tzinfo is None:
-                        dt_obj = LOCALTIMEZONE.localize(dt_obj)
-                    item[tkey] = dt_obj
-                except TypeError:
-                    pass
-
-            if self.args.verbose > 1:
+            if self.args.verbose > 9:
                 pprint.pprint(item)
             yield item
 
