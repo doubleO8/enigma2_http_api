@@ -12,6 +12,7 @@ Welcome to enigma2_http_api's documentation!
 
     controller
     utils
+    model
 
 
 Indices and tables
