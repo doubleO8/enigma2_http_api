@@ -8,6 +8,7 @@ import datetime
 import pytz
 
 from utils import parse_servicereference, create_servicereference
+from utils import pseudo_unique_id
 
 #: default/fallback value for local timezone
 #: as the enigma2 API returns localised timestamps (not UTC!) one need to set
@@ -78,6 +79,10 @@ _META_MAP = {
     }
 }
 
+EVENT_HEADER_FMT = u'{start_time} -- {stop_time} #{item_id:06d} {service_name}'
+EVENT_TITLE_FMT = u'{title}{shortinfo}'
+EVENT_BODY_FMT = u'{duration} {longinfo}'
+EVENT_PSEUDO_ID_FMT = u'PSEUDO ID: {pseudo_id}'
 
 class EEvent(dict):
     """
@@ -94,6 +99,7 @@ class EEvent(dict):
         #. ETSI ETR 288 TECHNICAL October 1996
 
     """
+
     def __init__(self, *args, **kwargs):
         """
         Container class for timer or EPG items providing unified access to the
@@ -174,6 +180,14 @@ class EEvent(dict):
 
         self.service_reference = create_servicereference(
             parse_servicereference(self.service_reference))
+
+        self.longinfo = self.longinfo.replace(u"\u008a", "\n")
+
+        try:
+            self.pseudo_id = pseudo_unique_id(self)
+        except Exception:
+            self.pseudo_id = None
+
 
     def __str__(self):
         return '[{:s}#{:d}] {:s} {:s}{:s}'.format(

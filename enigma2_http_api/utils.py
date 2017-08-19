@@ -4,6 +4,8 @@ import os
 import datetime
 import hashlib
 import re
+import codecs
+import sys
 
 # https://wiki.neutrino-hd.de/wiki/Enigma:Services:Formatbeschreibung
 # Dezimalwert: 1=TV, 2=Radio, 4=NVod, andere=Daten
@@ -347,6 +349,25 @@ def enigma_trunkname(path):
         return parts[0]
 
     raise ValueError(repr(path))
+
+
+def set_output_encoding(encoding='utf-8'):
+    """
+    Stolen from https://stackoverflow.com/
+        questions/19696652/piping-output-causes-python-program-to-fail
+
+    When piping to the terminal, python knows the encoding needed, and
+    sets it automatically. But when piping to another program (for example,
+    | less), python can not check the output encoding. In that case, it
+    is None. What I am doing here is to catch this situation for both
+    stdout and stderr and force the encoding
+    """
+    current = sys.stdout.encoding
+    if current is None:
+        sys.stdout = codecs.getwriter(encoding)(sys.stdout)
+    current = sys.stderr.encoding
+    if current is None:
+        sys.stderr = codecs.getwriter(encoding)(sys.stderr)
 
 
 if __name__ == '__main__':

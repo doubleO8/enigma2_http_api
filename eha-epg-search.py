@@ -2,23 +2,18 @@
 # -*- coding: utf-8 -*-
 import pprint
 import logging
-import time
-import sys
-import os
 import argparse
-import json
 import datetime
-import re
 
 import pytz
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from enigma2_http_api.controller import Enigma2APIController
 from enigma2_http_api.utils import parse_servicereference
 from enigma2_http_api.utils import normalise_servicereference
-from enigma2_http_api.utils import pseudo_unique_id
+from enigma2_http_api.utils import set_output_encoding
 from enigma2_http_api.utils import SERVICE_TYPE_TV, SERVICE_TYPE_HDTV
+from enigma2_http_api.model import EVENT_HEADER_FMT, EVENT_TITLE_FMT
+from enigma2_http_api.model import EVENT_BODY_FMT
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -35,31 +30,25 @@ class EPGSearch(Enigma2APIController):
         self.timezone = pytz.timezone(self.args.local_timezone)
 
     def main(self):
+        set_output_encoding()
+
         for item in self.search(self.args.search_query):
-            try:
-                pseudo_id = pseudo_unique_id(item)
-            except Exception:
-                pseudo_id = None
-            print('#{eit:06d} {servicename:50s} {begin_dt} -- {end_dt}'.format(
-                   eit=item['id'], servicename=item['sname'],
-                   begin_dt=item['begin_timestamp_dt'].strftime('%d.%m.%Y %H:%M'),
-                   end_dt=(item['begin_timestamp_dt'] + datetime.timedelta(seconds=item['duration_sec'])).strftime('%H:%M'),
-                  )
-            )
-            print u'{name}'.format(name=item['title'])
-            print u'{description:50s} ({duration}s) PSEUDO_ID={pseudo_id}'.format(
-                description=item['shortdesc'],
-                duration=item['duration'],
-                pseudo_id=pseudo_id
-            )
-            print " "
-
+            print(EVENT_HEADER_FMT.format(
+                item_id=item.item_id, service_name=item.service_name,
+                start_time=item.start_time.strftime('%d.%m.%Y %H:%M'),
+                stop_time=item.stop_time.strftime('%H:%M'),
+            ))
+            print(EVENT_TITLE_FMT.format(
+                title=item.title,
+                shortinfo=(
+                item.shortinfo and u' - {:s}'.format(item.shortinfo) or "")))
             if self.args.verbose > 0:
-                print u'{descriptionextended}'.format(descriptionextended=item['longdesc'])
-
+                print(EVENT_BODY_FMT.format(
+                    duration='{:d} mins.'.format(item.duration.seconds / 60),
+                    longinfo=item.longinfo))
+            print " "
             if self.args.verbose > 2:
                 pprint.pprint(item)
-
             print " "
 
     def _update_lookup_map(self):
