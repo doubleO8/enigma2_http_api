@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Model classes and constants.
+----------------------------
+
 """
 import datetime
 
@@ -84,6 +86,7 @@ EVENT_TITLE_FMT = u'{title}{shortinfo}'
 EVENT_BODY_FMT = u'{duration} {longinfo}'
 EVENT_PSEUDO_ID_FMT = u'PSEUDO ID: {pseudo_id}'
 
+
 class EEvent(dict):
     """
     This is a thin wrapper class to allow unified access to event items' data.
@@ -97,6 +100,11 @@ class EEvent(dict):
 
         #. ETSI EN 300 707 V1.2.1 (2002-12)
         #. ETSI ETR 288 TECHNICAL October 1996
+
+    .. seealso::
+
+        * http://www.etsi.org/deliver/etsi_en/300700_300799/300707/01.02.01_40/en_300707v010201o.pdf
+        * http://www.etsi.org/deliver/etsi_etr/200_299/288/01_60/etr_288e01p.pdf
 
     """
 
@@ -187,7 +195,6 @@ class EEvent(dict):
             self.pseudo_id = pseudo_unique_id(self)
         except Exception:
             self.pseudo_id = None
-
 
     def __str__(self):
         return '[{:s}#{:d}] {:s} {:s}{:s}'.format(
