@@ -375,7 +375,7 @@ class Enigma2APIController(BlacklistController):
         res = self._apicall('epgsearch', params=params, filter_key='events')
         if filter_func is not None:
             return [EEvent(x, timezone=self.timezone) for x in filter_func(res)]
-        return res
+        return [EEvent(x, timezone=self.timezone) for x in  res]
 
     def get_zap(self, service_ref):
         """
