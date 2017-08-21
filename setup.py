@@ -22,5 +22,6 @@ setup(
         'eha-movie-list.py',
         'eha-timer-list.py',
         'eha-service-list.py',
+        'eha-epg-search.py',
     ]
 )
