@@ -13,8 +13,8 @@ setup(
     author_email="wb008@hdm-stuttgart.de",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    description='enigma2 HTP API client library',
-    long_description="",
+    description='enigma2 HTTP API client library',
+    long_description="enigma2_http_api's main goal is providing a thin wrapper library for the Enigma2 WebInterface. Using the library may help controlling enigma2 based STBs either from the enigma2 device itself or from a remote host.",
     url="https://github.com/doubleO8/enigma2_http_api",
     packages=['enigma2_http_api'],
     install_requires=['pytz', 'requests'],
@@ -23,5 +23,6 @@ setup(
         'eha-timer-list.py',
         'eha-service-list.py',
         'eha-epg-search.py',
+        'eha-utility-belt.py',
     ]
 )
