@@ -196,6 +196,10 @@ class EEvent(dict):
         except Exception:
             self.pseudo_id = None
 
+    def get_global_id(self):
+        return '{:s}{:d}'.format(self.service_reference, self.item_id)
+    global_id = property(get_global_id)
+
     def __str__(self):
         return '[{:s}#{:d}] {:s} {:s}{:s}'.format(
             self.service_name, self.item_id,
