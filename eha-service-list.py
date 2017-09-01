@@ -5,6 +5,7 @@ import sys
 import os
 import argparse
 
+from enigma2_http_api.defaults import REMOTE_ADDR
 from enigma2_http_api.controller import Enigma2APIController
 from enigma2_http_api.utils import parse_servicereference
 from enigma2_http_api.utils import normalise_servicereference
@@ -116,13 +117,12 @@ class ServiceLister(Enigma2APIController):
 
 
 if __name__ == '__main__':
-    default_remote_addr = '127.0.0.1'
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--dry-run', '-n', action='store_true',
                            dest="dry_run",
                            help="dry run mode", default=False)
     argparser.add_argument('--remote-addr', '-a', dest="remote_addr",
-                           default=default_remote_addr,
+                           default=REMOTE_ADDR,
                            help="enigma2 host address, default %(default)s")
 
     group1 = argparser.add_argument_group('Sorting', 'Output Sorting')

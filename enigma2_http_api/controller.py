@@ -22,6 +22,15 @@ POWERSTATE_RESTART = 3
 POWERSTATE_WAKEUP = 4
 POWERSTATE_STANDBY = 5
 
+POWERSTATE_MAP = {
+    'toggle-standby': POWERSTATE_TOGGLE_STANDBY,
+    'deep-standby': POWERSTATE_DEEPSTANDBY,
+    'reboot': POWERSTATE_REBOOT,
+    'restart': POWERSTATE_RESTART,
+    'wakeup': POWERSTATE_WAKEUP,
+    'standby': POWERSTATE_STANDBY,
+}
+
 MESSAGETYPE_YES_NO = 0
 MESSAGETYPE_INFO = 1
 MESSAGETYPE_MESSAGE = 2
@@ -375,7 +384,7 @@ class Enigma2APIController(BlacklistController):
         res = self._apicall('epgsearch', params=params, filter_key='events')
         if filter_func is not None:
             return [EEvent(x, timezone=self.timezone) for x in filter_func(res)]
-        return res
+        return [EEvent(x, timezone=self.timezone) for x in  res]
 
     def get_zap(self, service_ref):
         """

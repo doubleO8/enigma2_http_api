@@ -9,6 +9,7 @@ import pytz
 
 from enigma2_http_api.defaults import REMOTE_ADDR
 from enigma2_http_api.controller import Enigma2APIController
+from enigma2_http_api.controller import POWERSTATE_MAP
 from enigma2_http_api.utils import parse_servicereference
 from enigma2_http_api.utils import normalise_servicereference
 from enigma2_http_api.utils import set_output_encoding
@@ -22,8 +23,9 @@ logging.basicConfig(level=logging.INFO,
 
 LOG = logging.getLogger("eha_epg_search")
 
+API_CALL_PREFIX = 'api_call-'
 
-class EPGSearch(Enigma2APIController):
+class UtilityBelt(Enigma2APIController):
     def __init__(self, *args, **kwargs):
         Enigma2APIController.__init__(self, *args, **kwargs)
         self.args = kwargs.get("cli_args")
@@ -33,24 +35,22 @@ class EPGSearch(Enigma2APIController):
     def main(self):
         set_output_encoding()
 
-        for item in self.search(self.args.search_query):
-            print(EVENT_HEADER_FMT.format(
-                item_id=item.item_id, service_name=item.service_name,
-                start_time=item.start_time.strftime('%d.%m.%Y %H:%M'),
-                stop_time=item.stop_time.strftime('%H:%M'),
-            ))
-            print(EVENT_TITLE_FMT.format(
-                title=item.title,
-                shortinfo=(
-                item.shortinfo and u' - {:s}'.format(item.shortinfo) or "")))
-            if self.args.verbose > 0:
-                print(EVENT_BODY_FMT.format(
-                    duration='{:d} mins.'.format(item.duration.seconds / 60),
-                    longinfo=item.longinfo))
-            print " "
-            if self.args.verbose > 2:
-                pprint.pprint(item)
-            print " "
+        if self.args.power_state != -1:
+            pprint.pprint(self.get_powerstate(self.args.power_state))
+        elif self.args.mode.startswith(API_CALL_PREFIX):
+            api_call = self.args.mode.replace(API_CALL_PREFIX, '')
+            self.dump_api_result(api_call)
+        else:
+            try:
+                getattr(self, self.args.mode)()
+            except AttributeError, aexception:
+                self.log.error("Ha! Unsupported: {!r}".format(aexception))
+                                        
+    def about(self):
+        pprint.pprint(self.get_about())
+
+    def dump_api_result(self, api_call):
+        pprint.pprint(self._apicall(api_call))
 
     def _update_lookup_map(self):
         st = (SERVICE_TYPE_TV, SERVICE_TYPE_HDTV)
@@ -72,20 +72,6 @@ class EPGSearch(Enigma2APIController):
                           key=lambda x: normalise_servicereference(x)):
             self.log.debug("{:s}> {!r}".format(normalise_servicereference(key),
                                                self.lookup_map[key]))
-
-    def filter_search_results(self, data):
-        for item in data:
-            if self.args.verbose > 9:
-                pprint.pprint(item)
-
-            del item['picon']
-
-            if self.args.verbose > 9:
-                pprint.pprint(item)
-            yield item
-
-    def search(self, what):
-        return self.get_search(what, filter_func=self.filter_search_results)
 
     def zap(self, what):
         zap_to = None
@@ -124,14 +110,54 @@ if __name__ == '__main__':
     argparser.add_argument('--remote-addr', '-a', dest="remote_addr",
                            default=REMOTE_ADDR,
                            help="enigma2 host address, default %(default)s")
-    argparser.add_argument(dest="search_query",
-                           help="Search query")
     argparser.add_argument('--timezone', dest="local_timezone",
                            default='Europe/Berlin',
                            help="local timezone, default %(default)s")
 
+    group_op = argparser.add_argument_group('Tools')
+    group_op.add_argument('--about',
+                          help='Dump "about" dataset',
+                          action='store_const', const='about',
+                          default='about', dest="mode")
+
+    group_ac = argparser.add_argument_group('Miscellaneous API calls')
+    api_calls = [
+        'currenttime',
+        # 'external',
+        'getaudiotracks',
+        'getcurrlocation',
+        'getlocations',
+        'getpid',
+        'gettags',
+        'mediaplayercurrent',
+        'movietags',
+        'parentcontrollist',
+        'pluginlistread',
+        'powerstate',
+        'restarttwisted',
+        # 'session',
+        'settings',
+        'vol',
+    ]
+
+    for ac in api_calls:
+        group_ac.add_argument(
+            '--{:s}'.format(ac),
+            help='Dump data of API call {:s}'.format(ac),
+            action='store_const', const='{:s}{:s}'.format(
+                API_CALL_PREFIX, ac),
+            default='about', dest="mode")
+
+    group_power = argparser.add_argument_group('Power State Altering')
+    for pw in POWERSTATE_MAP:
+        group_power.add_argument(
+            '--{:s}'.format(pw),
+            help='Alter Powerstate: {:s}'.format(pw),
+            action='store_const', const=POWERSTATE_MAP[pw],
+            default=-1, dest="power_state")
+
     args = argparser.parse_args()
 
-    es = EPGSearch(remote_addr=args.remote_addr,
-                   dry_run=args.dry_run, cli_args=args)
-    es.main()
+    ub = UtilityBelt(remote_addr=args.remote_addr,
+                     dry_run=args.dry_run, cli_args=args)
+    ub.main()
