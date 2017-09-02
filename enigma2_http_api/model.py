@@ -138,6 +138,24 @@ class EEvent(dict):
         True
         >>> timer_d.service_reference == expected['service_reference']
         True
+        >>> timer_d.pseudo_id
+        'c2e47cb10e10e6c7aaefadae26fdba2d35a9411a'
+        >>> epg_d.pseudo_id is None
+        True
+        >>> timer_d.global_id == epg_d.global_id
+        True
+        >>> from example_data import example_timer_radio, expected_radio
+        >>> timer_r = EEvent(example_timer_radio)
+        >>> timer_r.title == expected_radio['title']
+        True
+        >>> timer_r.shortinfo == expected_radio['shortinfo']
+        True
+        >>> timer_r.service_name == expected_radio['service_name']
+        True
+        >>> timer_r.global_id
+        '1:0:2:6f37:431:a401:ffff0000:0:0:0:6784'
+        >>> timer_r.pseudo_id
+        '9c357fbab2a36d905a9c2658eac6c11df1d23a85'
         """
         dict.__init__(self, *args, **kwargs)
         if kwargs.get("timezone") is None:
