@@ -281,6 +281,16 @@ def pseudo_unique_id(item):
     return m.hexdigest()
 
 
+def pseudo_unique_id_radio(item):
+    return pseudo_unique_id(
+        {
+            "title": item.get("title"),
+            "longdesc": "{:s},{:s}".format(
+                item.get("sref"), item.get("date"))
+        }
+    )
+
+
 def enigma_trunkname(path):
     """
     Determine the trunk of enigma2 specific files.

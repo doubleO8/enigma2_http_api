@@ -10,7 +10,8 @@ import datetime
 import pytz
 
 from utils import parse_servicereference, create_servicereference
-from utils import pseudo_unique_id
+from utils import pseudo_unique_id, pseudo_unique_id_radio
+from utils import SERVICE_TYPE_RADIO
 
 #: default/fallback value for local timezone
 #: as the enigma2 API returns localised timestamps (not UTC!) one need to set
@@ -204,15 +205,21 @@ class EEvent(dict):
         else:
             raise ValueError("Unsupported type {!r}".format(self._type))
 
-        self.service_reference = create_servicereference(
-            parse_servicereference(self.service_reference))
+        psr = parse_servicereference(self.service_reference)
+        self.service_reference = create_servicereference(psr)
 
         self.longinfo = self.longinfo.replace(u"\u008a", "\n")
+
+        self.pseudo_id = None
 
         try:
             self.pseudo_id = pseudo_unique_id(self)
         except Exception:
-            self.pseudo_id = None
+            try:
+                if psr['service_type'] == SERVICE_TYPE_RADIO:
+                    self.pseudo_id = pseudo_unique_id_radio(self)
+            except Exception:
+                pass
 
     def get_global_id(self):
         return '{:s}{:d}'.format(self.service_reference, self.item_id)
