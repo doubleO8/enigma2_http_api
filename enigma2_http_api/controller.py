@@ -8,7 +8,6 @@ import codecs
 
 import requests
 
-from utils import pseudo_unique_id
 from model import EEvent
 
 #: enigma2 web interface URL format string
@@ -61,7 +60,7 @@ class BlacklistController(object):
         if filename is None:
             raise AssertionError('[update] blacklist filename may not be None')
 
-        self.log.info("Trying to load blacklist: {!r}".format(filename))
+        self.log.debug('%s', "Trying to load blacklist: {!r}".format(filename))
 
         try:
             with codecs.open(filename, "rb", "utf-8") as source:
@@ -72,9 +71,9 @@ class BlacklistController(object):
 
             self.blacklist.update(data)
         except IOError, ierr:
-            self.log.warning(
-                "Failed to load blacklist data {!r}: {!s}".format(
-                    filename, ierr))
+            self.log.warning('%s',
+                             "Failed to load blacklist data {!r}: {!s}".format(
+                                 filename, ierr))
 
         self.log.debug("the blacklist contains {:d} entrie(s)".format(
             len(self.blacklist)))
@@ -90,12 +89,10 @@ class BlacklistController(object):
                 "[persist] blacklist filename may not be None!")
 
         for item in items:
-            try:
-                pseudo_id = pseudo_unique_id(item)
-                data[pseudo_id] = item
-            except AssertionError:
-                self.log.warning("Cannot generate pseudo ID for item:")
-                self.log.warning(repr(item))
+            if item.pseudo_id is None:
+                self.log.warning('%s', "Pseudo ID is None: {!r}".format(item))
+                continue
+            data[item.pseudo_id] = item
 
         if not data:
             self.log.warning("No data to persist ..")
@@ -127,9 +124,9 @@ class Enigma2APIController(BlacklistController):
         self.timezone = kwargs.get("timezone")
 
         if self.dump_requests:
-            self.log.info(
-                "{!r} will contain request dump files".format(
-                    self.dump_requests))
+            self.log.info('%s',
+                          "{!r} will contain request dump files".format(
+                              self.dump_requests))
 
     def _get(self, url, **kwargs):
         """
@@ -194,8 +191,8 @@ class Enigma2APIController(BlacklistController):
             try:
                 self._dump_request(req, filter_key)
             except Exception, exc:
-                self.log.warning(
-                    "Request dumping failed: {!r}".format(exc))
+                self.log.warning('%s',
+                                 "Request dumping failed: {!r}".format(exc))
 
         rv = req.json()
         if filter_key:
@@ -210,18 +207,13 @@ class Enigma2APIController(BlacklistController):
         Enigma2 box.
         """
         res = self.get_movielist()
-        # self.log.info(pprint.pformat(res))
         self.movielist = res['movies']
 
         for item in self.movielist:
-            try:
-                pseudo_id = pseudo_unique_id(item)
-                self.movielist_map[pseudo_id] = item
-            except AssertionError, aexc:
-                self.log.warning('%s',
-                                 "Cannot generate Pseudo ID for {!r}".format(
-                                     item))
-                # self.log.info(pprint.pformat(self.movielist_map))
+            if item.pseudo_id is None:
+                self.log.warning('%s', "Pseudo ID is None: {!r}".format(item))
+                continue
+            self.movielist_map[item.pseudo_id] = item
 
     def get_services(self):
         """
@@ -231,7 +223,6 @@ class Enigma2APIController(BlacklistController):
         :rtype: list
         """
         res = self._apicall('getservices', filter_key='services')
-        self.log.debug(pprint.pformat(res))
         services = list()
         for row in res:
             services.append((row['servicename'], row['servicereference']))
@@ -241,7 +232,8 @@ class Enigma2APIController(BlacklistController):
         params = {
             'sRef': service_ref,
         }
-        return self._apicall('getservices', params=params, filter_key='services')
+        return self._apicall('getservices', params=params,
+                             filter_key='services')
 
     def get_about(self):
         """
@@ -262,7 +254,8 @@ class Enigma2APIController(BlacklistController):
         :return: EPG datasets of current subservice
         :rtype: list
         """
-        res = self._apicall('epgbouquet', params={'bRef': bouquet_ref}, filter_key='events')
+        res = self._apicall('epgbouquet', params={'bRef': bouquet_ref},
+                            filter_key='events')
         if filter_func is not None:
             return list(filter_func(res))
         return res
@@ -276,7 +269,8 @@ class Enigma2APIController(BlacklistController):
         :return: EPG datasets of given service
         :rtype: list
         """
-        res = self._apicall('epgservice', params={'sRef': service_ref}, filter_key='events')
+        res = self._apicall('epgservice', params={'sRef': service_ref},
+                            filter_key='events')
         if filter_func is not None:
             return list(filter_func(res))
         return res
@@ -324,7 +318,8 @@ class Enigma2APIController(BlacklistController):
 
         :return:
         """
-        return [EEvent(x, timezone=self.timezone) for x in self._apicall('timerlist', filter_key='timers')]
+        return [EEvent(x, timezone=self.timezone) for x in
+                self._apicall('timerlist', filter_key='timers')]
 
     def get_timeradd(self, service_ref, params):
         """
@@ -384,7 +379,7 @@ class Enigma2APIController(BlacklistController):
         res = self._apicall('epgsearch', params=params, filter_key='events')
         if filter_func is not None:
             return [EEvent(x, timezone=self.timezone) for x in filter_func(res)]
-        return [EEvent(x, timezone=self.timezone) for x in  res]
+        return [EEvent(x, timezone=self.timezone) for x in res]
 
     def get_zap(self, service_ref):
         """
@@ -398,7 +393,7 @@ class Enigma2APIController(BlacklistController):
         }
 
         if self.dry_run:
-            self.log.info("WOULD zap to {!r}".format(service_ref))
+            self.log.info('%s', "WOULD zap to {!r}".format(service_ref))
             return service_ref
 
         return self._apicall('zap', params=params, filter_key='message')
@@ -415,7 +410,8 @@ class Enigma2APIController(BlacklistController):
         }
 
         if self.dry_run:
-            self.log.info("WOULD set powerstate to {!r}".format(new_state))
+            self.log.info('%s',
+                          "WOULD set powerstate to {!r}".format(new_state))
             return ''
 
         return self._apicall('powerstate', params=params)
@@ -440,6 +436,7 @@ class Enigma2APIController(BlacklistController):
 
         if self.dry_run:
             self.log.info(
+                '%s',
                 "WOULD send message {!r} type={!r} timeout={!r}".format(
                     messagetext, messagetype, timeout))
             return ''
@@ -466,6 +463,7 @@ class Enigma2APIController(BlacklistController):
 
         if self.dry_run:
             self.log.info(
+                '%s',
                 "WOULD send messageanswer {!r} timeout={!r}".format(
                     messagetext, timeout))
             return ''
@@ -481,8 +479,10 @@ if __name__ == '__main__':
     if not REMOTE_ADDR:
         sys.exit(-1)
     DUMP_REQUESTS = tempfile.mkdtemp()
-    print "REMOTE_ADDR={!s}, DUMP_REQUESTS={!s}".format(REMOTE_ADDR, DUMP_REQUESTS)
-    EAC = Enigma2APIController(remote_addr=REMOTE_ADDR, dump_requests=DUMP_REQUESTS)
+    print "REMOTE_ADDR={!s}, DUMP_REQUESTS={!s}".format(REMOTE_ADDR,
+                                                        DUMP_REQUESTS)
+    EAC = Enigma2APIController(remote_addr=REMOTE_ADDR,
+                               dump_requests=DUMP_REQUESTS)
     EAC.get_services()
     EAC.get_about()
     EAC.get_subservices()
