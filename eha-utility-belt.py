@@ -25,6 +25,7 @@ LOG = logging.getLogger("eha_epg_search")
 
 API_CALL_PREFIX = 'api_call-'
 
+
 class UtilityBelt(Enigma2APIController):
     def __init__(self, *args, **kwargs):
         Enigma2APIController.__init__(self, *args, **kwargs)
@@ -45,12 +46,15 @@ class UtilityBelt(Enigma2APIController):
                 getattr(self, self.args.mode)()
             except AttributeError, aexception:
                 self.log.error("Ha! Unsupported: {!r}".format(aexception))
-                                        
+
     def about(self):
         pprint.pprint(self.get_about())
 
     def dump_api_result(self, api_call):
         pprint.pprint(self._apicall(api_call))
+
+    def dump_has_rest_result(self):
+        pprint.pprint(self.has_rest_support())
 
     def _update_lookup_map(self):
         st = (SERVICE_TYPE_TV, SERVICE_TYPE_HDTV)
@@ -118,6 +122,10 @@ if __name__ == '__main__':
     group_op.add_argument('--about',
                           help='Dump "about" dataset',
                           action='store_const', const='about',
+                          default='about', dest="mode")
+    group_op.add_argument('--has-rest',
+                          help='Dump result of REST supported check',
+                          action='store_const', const='dump_has_rest_result',
                           default='about', dest="mode")
 
     group_ac = argparser.add_argument_group('Miscellaneous API calls')

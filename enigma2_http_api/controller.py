@@ -201,6 +201,27 @@ class Enigma2APIController(BlacklistController):
 
         return rv
 
+    def has_rest_support(self):
+        result = False
+        target_url = ENIGMA2_URL_FMT.format(scheme='http',
+                                            remote_addr=self.remote_addr,
+                                            path='file')
+        req = requests.options(target_url)
+
+        if req.status_code == 200:
+            expected_headers = [
+                'Access-Control-Allow-Origin',
+                'Access-Control-Allow-Credentials',
+                'Access-Control-Max-Age',
+                'Access-Control-Allow-Methods',
+                'Access-Control-Allow-Headers',
+            ]
+            expected_headers_set = set([x.lower() for x in expected_headers])
+            headers_set = set([x.lower() for x in req.headers.keys()])
+            result = (len(expected_headers) == len(expected_headers_set & headers_set))
+
+        return result
+
     def update_movielist_map(self):
         """
         Update internal movie list map *self.movielist_map*
