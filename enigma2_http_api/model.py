@@ -84,7 +84,7 @@ _META_MAP = {
         LONGINFO: 'longdesc',
     },
     ITEM_TYPE_MOVIE: {
-        ID: 'id',
+        ID: None,
         TITLE: 'eventname',
         START_TIMESTAMP: 'recordingtime',
         STOP_TIMESTAMP: None,

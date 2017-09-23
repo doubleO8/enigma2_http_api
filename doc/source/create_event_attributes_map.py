@@ -6,6 +6,7 @@ sys.path.insert(0, '../../')
 
 from enigma2_http_api.model import _METAMAP_ATTRIBUTES
 from enigma2_http_api.model import _META_MAP, ITEM_TYPE_EPG, ITEM_TYPE_TIMER
+from enigma2_http_api.model import ITEM_TYPE_TIMER, ITEM_TYPE_MOVIE
 from enigma2_http_api.model import START_TIMESTAMP, STOP_TIMESTAMP, DURATION
 
 rows = []
@@ -22,7 +23,7 @@ attributes.update(more_attributes)
 for attribute_name in sorted(attributes.keys()):
     key = _METAMAP_ATTRIBUTES[attribute_name]
     portions = [attribute_name]
-    for item_type in (ITEM_TYPE_EPG, ITEM_TYPE_TIMER):
+    for item_type in (ITEM_TYPE_EPG, ITEM_TYPE_TIMER, ITEM_TYPE_MOVIE):
         original_name = _META_MAP[item_type].get(key)
         if original_name is None:
             original_name = '-- n/a --'
@@ -32,7 +33,7 @@ for attribute_name in sorted(attributes.keys()):
     for x in portions:
         max_len = max(max_len, len(x))
 
-header_items = ('EEvent attribute', ITEM_TYPE_EPG, ITEM_TYPE_TIMER)
+header_items = ('EEvent attribute', ITEM_TYPE_EPG, ITEM_TYPE_TIMER, ITEM_TYPE_MOVIE)
 for x in header_items:
     max_len = max(max_len, len(x))
 
