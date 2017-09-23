@@ -10,7 +10,7 @@ import datetime
 import pytz
 
 from utils import parse_servicereference, create_servicereference
-from utils import pseudo_unique_id, pseudo_unique_id_radio
+from utils import pseudo_unique_id_any
 from utils import SERVICE_TYPE_RADIO
 
 #: default/fallback value for local timezone
@@ -210,19 +210,12 @@ class EEvent(dict):
 
         self.longinfo = self.longinfo.replace(u"\u008a", "\n")
 
-        self.pseudo_id = None
-
-        try:
-            self.pseudo_id = pseudo_unique_id(self)
-        except Exception:
-            try:
-                if psr['service_type'] == SERVICE_TYPE_RADIO:
-                    self.pseudo_id = pseudo_unique_id_radio(self)
-            except Exception:
-                pass
+        self.pseudo_id = pseudo_unique_id_any(
+            self, is_radio=(psr['service_type'] == SERVICE_TYPE_RADIO))
 
     def get_global_id(self):
         return '{:s}{:d}'.format(self.service_reference, self.item_id)
+
     global_id = property(get_global_id)
 
     def __str__(self):

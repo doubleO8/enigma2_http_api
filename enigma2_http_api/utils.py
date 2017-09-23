@@ -291,6 +291,19 @@ def pseudo_unique_id_radio(item):
     )
 
 
+def pseudo_unique_id_any(item, is_radio=False):
+    try:
+        return pseudo_unique_id(item)
+    except Exception:
+        try:
+            if is_radio:
+                return pseudo_unique_id_radio(item)
+        except Exception:
+            pass
+
+    return None
+
+
 def enigma_trunkname(path):
     """
     Determine the trunk of enigma2 specific files.
