@@ -211,10 +211,11 @@ class Enigma2APIController(BlacklistController):
         self.movielist = res['movies']
 
         for item in self.movielist:
-            if item.pseudo_id is None:
+            e_item = EEvent(item)
+            if e_item.pseudo_id is None:
                 self.log.warning('%s', "Pseudo ID is None: {!r}".format(item))
                 continue
-            self.movielist_map[item.pseudo_id] = item
+            self.movielist_map[e_item.pseudo_id] = e_item
 
     def get_services(self):
         """
