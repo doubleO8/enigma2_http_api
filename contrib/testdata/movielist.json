@@ -1,0 +1,59 @@
+{
+  "directory": "/media/hdd/movie/",
+  "movies": [
+    {
+      "filename_stripped": "20170921 2055 - DASDING - DASDING Sprechstunde - .ts",
+      "description": "",
+      "tags": "",
+      "filesize": 344211456,
+      "eventname": "DASDING Sprechstunde",
+      "servicename": "DASDING",
+      "filesize_readable": "328.27 MB",
+      "serviceref": "1:0:0:0:0:0:0:0:0:0:/media/hdd/movie/20170921 2055 - DASDING - DASDING Sprechstunde - .ts",
+      "filename": "/media/hdd/movie/20170921 2055 - DASDING - DASDING Sprechstunde - .ts",
+      "length": "129:38",
+      "lastseen": 0,
+      "fullname": "1:0:0:0:0:0:0:0:0:0:/media/hdd/movie/20170921 2055 - DASDING - DASDING Sprechstunde - .ts",
+      "recordingtime": 1506020100,
+      "descriptionExtended": "",
+      "begintime": "21.9., 20:55"
+    },
+    {
+      "filename_stripped": "20170917 2355 - MDR SPUTNIK - SPUTNIK Black Beatz - Wiederholung - Die schwarze DJ-Show.ts",
+      "description": "Die schwarze DJ-Show",
+      "tags": "",
+      "filesize": 344596480,
+      "eventname": "SPUTNIK Black Beatz - Wiederholung",
+      "servicename": "MDR SPUTNIK",
+      "filesize_readable": "328.63 MB",
+      "serviceref": "1:0:0:0:0:0:0:0:0:0:/media/hdd/movie/20170917 2355 - MDR SPUTNIK - SPUTNIK Black Beatz - Wiederholung - Die schwarze DJ-Show.ts",
+      "filename": "/media/hdd/movie/20170917 2355 - MDR SPUTNIK - SPUTNIK Black Beatz - Wiederholung - Die schwarze DJ-Show.ts",
+      "length": "129:47",
+      "lastseen": 0,
+      "fullname": "1:0:0:0:0:0:0:0:0:0:/media/hdd/movie/20170917 2355 - MDR SPUTNIK - SPUTNIK Black Beatz - Wiederholung - Die schwarze DJ-Show.ts",
+      "recordingtime": 1505685300,
+      "descriptionExtended": "Feinster R'n'B, tighter HipHop und gef\u00fchlvoller Soul im Mix. So klingt die perfekte Einstimmung auf das Wochenende: von Classics bis zum Neuesten aus den amerikanischen Blackmusic-Charts und mit den Top Five der Deutschen Black Charts. Matthy mixt all das, was in der Blackmusic nicht verpasst werden darf.",
+      "begintime": "17.9., 23:55"
+    },
+    {
+      "filename_stripped": "20170830 1650 - TNT Serie HD (S) - Animal Kingdom - S\u00fcndenbock.ts",
+      "description": "S\u00fcndenbock",
+      "tags": "",
+      "filesize": 0,
+      "eventname": "Animal Kingdom",
+      "servicename": "TNT Serie HD (S)",
+      "filesize_readable": "",
+      "serviceref": "1:0:0:0:0:0:0:0:0:0:/media/hdd/movie/20170830 1650 - TNT Serie HD (S) - Animal Kingdom - S\u00fcndenbock.ts",
+      "filename": "/media/hdd/movie/20170830 1650 - TNT Serie HD (S) - Animal Kingdom - S\u00fcndenbock.ts",
+      "length": "?:??",
+      "lastseen": 0,
+      "fullname": "1:0:0:0:0:0:0:0:0:0:/media/hdd/movie/20170830 1650 - TNT Serie HD (S) - Animal Kingdom - S\u00fcndenbock.ts",
+      "recordingtime": 1504104600,
+      "descriptionExtended": "1. Staffel, Folge 5: XXXXX XXXXXXXXX XXXX XXXXXX D\u00e4mxxxx XX xxxxxxXx XXX XXXXXXX xxxx XXXX XXXXX XX XXXXXXX XXX xxxx XX XXXXXXXX XXXXXXX XXXXXXX x\u00e4xxxx XXX xxx XXXXX xxxx xxxxx XXX xxx XXXXXXX XXXX xx XXX XXXXX Xp\u00fclxx X\u00f6xxXXX X XXXX XXX XXXXXX XXXxxxxx xxx xxx xxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 50 Min.\n2016.\nAb 12 Jahren",
+      "begintime": "30.8., 16:50"
+    }
+  ],
+  "bookmarks": [
+    "trashcan"
+  ]
+}

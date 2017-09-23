@@ -10,7 +10,7 @@ import datetime
 import pytz
 
 from utils import parse_servicereference, create_servicereference
-from utils import pseudo_unique_id_any
+from utils import pseudo_unique_id_any, pseudo_unique_id_radio
 from utils import SERVICE_TYPE_RADIO
 
 #: default/fallback value for local timezone
@@ -57,6 +57,9 @@ ITEM_TYPE_TIMER = 'timer'
 #: type identifier for EPG items
 ITEM_TYPE_EPG = 'epg'
 
+#: type identifier for MOVIE items
+ITEM_TYPE_MOVIE = 'movie'
+
 _META_MAP = {
     ITEM_TYPE_TIMER: {
         ID: 'eit',
@@ -79,6 +82,17 @@ _META_MAP = {
         SERVICE_REFERENCE: 'sref',
         SHORTINFO: 'shortdesc',
         LONGINFO: 'longdesc',
+    },
+    ITEM_TYPE_MOVIE: {
+        ID: 'id',
+        TITLE: 'eventname',
+        START_TIMESTAMP: 'recordingtime',
+        STOP_TIMESTAMP: None,
+        DURATION: 'length',
+        SERVICE_NAME: 'servicename',
+        SERVICE_REFERENCE: 'serviceref',
+        SHORTINFO: 'description',
+        LONGINFO: 'descriptionExtended',
     }
 }
 
@@ -174,10 +188,11 @@ class EEvent(dict):
         return self.timezone.localize(dt_obj)
 
     def _init_attributes(self):
-        try:
-            self['duration_sec']
+        if 'duration_sec' in self:
             self._type = ITEM_TYPE_EPG
-        except KeyError:
+        elif 'recordingtime' in self:
+            self._type = ITEM_TYPE_MOVIE
+        else:
             self._type = ITEM_TYPE_TIMER
 
         attr_map = _META_MAP[self._type]
@@ -202,6 +217,15 @@ class EEvent(dict):
             self.stop_time = self.start_time + self.duration
         elif self._type == ITEM_TYPE_TIMER:
             self.duration = self.stop_time - self.start_time
+        elif self._type == ITEM_TYPE_MOVIE:
+            try:
+                (minutes, seconds) = self[attr_map[DURATION]].split(":")
+                self.duration = datetime.timedelta(
+                    minutes=int(minutes), seconds=int(seconds))
+            except Exception:
+                self.duration = datetime.timedelta()
+            self.stop_time = self.start_time + self.duration
+            self.item_id = hash(self.service_reference)
         else:
             raise ValueError("Unsupported type {!r}".format(self._type))
 
@@ -210,8 +234,9 @@ class EEvent(dict):
 
         self.longinfo = self.longinfo.replace(u"\u008a", "\n")
 
-        self.pseudo_id = pseudo_unique_id_any(
-            self, is_radio=(psr['service_type'] == SERVICE_TYPE_RADIO))
+        is_radio = (psr['service_type'] == SERVICE_TYPE_RADIO)
+
+        self.pseudo_id = pseudo_unique_id_any(self, is_radio=is_radio)
 
     def get_global_id(self):
         return '{:s}{:d}'.format(self.service_reference, self.item_id)

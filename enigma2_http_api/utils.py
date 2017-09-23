@@ -93,6 +93,10 @@ def parse_servicereference(serviceref):
     >>> result2 = parse_servicereference(sref2)
     >>> result2
     {'service_type': 10, 'oid': 0, 'tsid': 0, 'ns': 0, 'sid': 0}
+    >>> sref3 = '1:0:0:0:0:0:0:0:0:0:/media/hdd/movie/20170921 2055 - DASDING - DASDING Sprechstunde - .ts'
+    >>> result3 = parse_servicereference(sref3)
+    >>> result3
+    {'service_type': 0, 'oid': 0, 'tsid': 0, 'ns': 0, 'sid': 0}
     """
     parts = serviceref.split(":")
     sref_data = {
@@ -254,6 +258,8 @@ def pseudo_unique_id(item):
     '4db3822ad252366e57d9515b1e37d3449a45a0cb'
     >>> pseudo_unique_id({'name': "x", 'descriptionextended': 'Bla Bla 18 Min.'})
     '4db3822ad252366e57d9515b1e37d3449a45a0cb'
+    >>> pseudo_unique_id({'eventname': "x", 'descriptionExtended': 'bla', 'description': ''})
+    '7a6615ef8ca6b06ac6a837741293759d3083a49c'
     """
 
     (name, desc) = None, None
