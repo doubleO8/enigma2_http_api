@@ -89,10 +89,11 @@ class BlacklistController(object):
                 "[persist] blacklist filename may not be None!")
 
         for item in items:
-            if item.pseudo_id is None:
+            e_item = EEvent(item)
+            if e_item.pseudo_id is None:
                 self.log.warning('%s', "Pseudo ID is None: {!r}".format(item))
                 continue
-            data[item.pseudo_id] = item
+            data[e_item.pseudo_id] = item
 
         if not data:
             self.log.warning("No data to persist ..")
@@ -210,10 +211,11 @@ class Enigma2APIController(BlacklistController):
         self.movielist = res['movies']
 
         for item in self.movielist:
-            if item.pseudo_id is None:
+            e_item = EEvent(item)
+            if e_item.pseudo_id is None:
                 self.log.warning('%s', "Pseudo ID is None: {!r}".format(item))
                 continue
-            self.movielist_map[item.pseudo_id] = item
+            self.movielist_map[e_item.pseudo_id] = item
 
     def get_services(self):
         """
