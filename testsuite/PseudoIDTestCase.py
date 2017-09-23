@@ -10,10 +10,8 @@ import datetime
 sys.path.insert(0, '..')
 
 from enigma2_http_api.utils import pseudo_unique_id, SERVICE_TYPE_RADIO
-from enigma2_http_api.utils import pseudo_unique_id_radio
 from enigma2_http_api.utils import pseudo_unique_id_any
 from enigma2_http_api.utils import parse_servicereference
-
 from enigma2_http_api.model import EEvent
 
 TD = os.path.abspath(
