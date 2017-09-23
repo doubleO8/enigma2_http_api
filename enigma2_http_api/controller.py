@@ -218,7 +218,9 @@ class Enigma2APIController(BlacklistController):
             ]
             expected_headers_set = set([x.lower() for x in expected_headers])
             headers_set = set([x.lower() for x in req.headers.keys()])
-            result = (len(expected_headers) == len(expected_headers_set & headers_set))
+            result = (
+                len(expected_headers) == len(expected_headers_set & headers_set)
+            )
 
         return result
 
