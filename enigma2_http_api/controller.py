@@ -48,6 +48,7 @@ class BlacklistController(object):
         self.log = logging.getLogger(__name__)
         self.blacklist = dict()
         self._blacklist_path = None
+        self._pseudo_id_none_warnings = kwargs.get("pseudo_id_none_warnings", True)
 
         if kwargs.get("blacklist_path"):
             self._blacklist_path = kwargs.get("blacklist_path")
@@ -91,7 +92,9 @@ class BlacklistController(object):
         for item in items:
             e_item = EEvent(item)
             if e_item.pseudo_id is None:
-                self.log.warning('%s', "Pseudo ID is None: {!r}".format(item))
+                if self._pseudo_id_none_warnings:
+                    self.log.warning(
+                        '%s', "Pseudo ID is None: {!r}".format(item))
                 continue
             data[e_item.pseudo_id] = item
 
@@ -236,7 +239,9 @@ class Enigma2APIController(BlacklistController):
         for item in self.movielist:
             e_item = EEvent(item)
             if e_item.pseudo_id is None:
-                self.log.warning('%s', "Pseudo ID is None: {!r}".format(item))
+                if self._pseudo_id_none_warnings:
+                    self.log.warning(
+                        '%s', "Pseudo ID is None: {!r}".format(item))
                 continue
             self.movielist_map[e_item.pseudo_id] = item
 
