@@ -4,10 +4,13 @@ import logging
 import sys
 import os
 import argparse
+import json
+import datetime
 
 from enigma2_http_api.defaults import REMOTE_ADDR
 from enigma2_http_api.controller import Enigma2APIController
 from enigma2_http_api.utils import parse_servicereference
+from enigma2_http_api.utils import create_servicereference
 from enigma2_http_api.utils import normalise_servicereference
 from enigma2_http_api.utils import SERVICE_TYPE_TV, SERVICE_TYPE_HDTV
 from enigma2_http_api.utils import NS_DVB_C
@@ -115,6 +118,21 @@ class ServiceLister(Enigma2APIController):
                 sref=item['servicereference']
             )
 
+    def dump(self):
+        data = {
+            "created": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+            "services": dict()
+        }
+
+        for key in self._sorted():
+            item = self.lookup_map[key]
+            sref = parse_servicereference(item['servicereference'])
+            item_key = create_servicereference(sref)
+            data['services'][item_key] = item
+
+        with open(self.args.dump_file, "wb") as tgt:
+            json.dump(data, tgt, indent=2)
+
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
@@ -124,6 +142,9 @@ if __name__ == '__main__':
     argparser.add_argument('--remote-addr', '-a', dest="remote_addr",
                            default=REMOTE_ADDR,
                            help="enigma2 host address, default %(default)s")
+    argparser.add_argument('--dump', dest="dump_file", metavar="FILE",
+                           default=None,
+                           help="File to dump service information to")
 
     group1 = argparser.add_argument_group('Sorting', 'Output Sorting')
     sortgroup = group1.add_mutually_exclusive_group()
@@ -159,3 +180,5 @@ if __name__ == '__main__':
     sli = ServiceLister(remote_addr=args.remote_addr,
                         dry_run=args.dry_run, cli_args=args)
     sli.list()
+    if args.dump_file:
+        sli.dump()
