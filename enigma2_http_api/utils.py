@@ -1,5 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+.. seealso::
+
+    * http://dreambox.de/board/index.php?thread/13534-satellite-position-id-need-to-know-what-western-ones-mean-for-my-plugin-englisch/&s=3f1817729cb55399e2a345953329ce54e8a1a150&postID=89843
+    * https://www.linuxtv.org/pipermail/linux-dvb/2005-June/002618.html
+    * http://radiovibrations.com/dreambox/namespace.htm
+    * http://www.dreambox-tools.info/print.php?threadid=1908&page=1&sid=1e12a523fe12d2073918670bff46ba23
+    * https://wiki.neutrino-hd.de/wiki/Enigma:Services:Formatbeschreibung
+    * http://radiovibrations.com/dreambox/services.htm
+
+"""
 import os
 import datetime
 import hashlib
@@ -7,7 +18,6 @@ import re
 import codecs
 import sys
 
-# stolen from enigma2_http_api ...
 # https://wiki.neutrino-hd.de/wiki/Enigma:Services:Formatbeschreibung
 # Dezimalwert: 1=TV, 2=Radio, 4=NVod, andere=Daten
 
@@ -40,24 +50,42 @@ SERVICE_TYPE = {
 
 SERVICE_TYPE_LOOKUP = {v: k for k, v in SERVICE_TYPE.iteritems()}
 
+NS_DVB_S_ASTRA = 192 << 16  # 0x00c00000
+NS_DVB_S_HOTBIRD = 130 << 16  # 0x00820000
+
 #: Namespace - DVB-C services
 NS_DVB_C = 0xffff0000
+NS_DVB_C_LABEL = 'DVB-C'
 
 #: Namespace - DVB-S services
-NS_DVB_S = 0x00c00000
+NS_DVB_S = NS_DVB_S_ASTRA
+NS_DVB_S_LABEL = 'DVB-S'
 
 #: Namespace - DVB-T services
 NS_DVB_T = 0xeeee0000
+NS_DVB_T_LABEL = 'DVB-T'
 
 #: Label:Namespace map
 NS = {
-    'DVB-C': NS_DVB_C,
-    'DVB-S': NS_DVB_S,
-    'DVB-T': NS_DVB_T,
+    NS_DVB_C_LABEL: NS_DVB_C,
+    NS_DVB_S_LABEL: NS_DVB_S,
+    NS_DVB_T_LABEL: NS_DVB_T,
 }
 
+NS_FILE_LABEL = 'File'
+
 #: Namespace:Label lookup map
-NS_LOOKUP = {v: k for k, v in NS.iteritems()}
+NS_LOOKUP = {
+    NS_DVB_C: NS_DVB_C_LABEL,
+    NS_DVB_S: NS_DVB_S_LABEL,
+    NS_DVB_S_HOTBIRD: NS_DVB_S_LABEL,
+    NS_DVB_T: NS_DVB_T_LABEL,
+    0: NS_FILE_LABEL,
+    NS_DVB_C >> 0x10: NS_DVB_C_LABEL,
+    NS_DVB_S >> 0x10: NS_DVB_S_LABEL,
+    NS_DVB_S_HOTBIRD >> 0x10: NS_DVB_S_LABEL,
+    NS_DVB_T >> 0x10: NS_DVB_T_LABEL,
+}
 
 #: list of tuples which may contain title and description of an event
 LISTING_ITEM_KEY_PAIRS = [
@@ -70,6 +98,53 @@ LISTING_ITEM_KEY_PAIRS = [
 # sondern Magnums Leben in Gefahr... 47 Min.
 PATTERN_RUNLENGTH = r'\s\d+\sMin\.'
 RE_RUNLENGTH = re.compile(PATTERN_RUNLENGTH)
+
+
+def guess_namespace_label(value, fallback='UNKNOWN'):
+    """
+    Try to guess a textual representation for given namespace value.
+
+    :param value: namespace
+    :param fallback: value to be returned if no matching label is found
+    :return: label
+    :rtype: basestring
+
+    >>> guess_namespace_label(1234)
+    'UNKNOWN'
+    >>> guess_namespace_label(99, 'DVB-S')
+    'DVB-S'
+    >>> guess_namespace_label(0x0)
+    'File'
+    >>> guess_namespace_label(0x00c00000)
+    'DVB-S'
+    >>> guess_namespace_label(0x0c0)
+    'DVB-S'
+    >>> guess_namespace_label(0x00c0)
+    'DVB-S'
+    >>> guess_namespace_label(0x00c01234)
+    'DVB-S'
+    >>> guess_namespace_label(0x00820000)
+    'DVB-S'
+    >>> guess_namespace_label(0x0082)
+    'DVB-S'
+    >>> guess_namespace_label(0x00820082)
+    'DVB-S'
+    >>> guess_namespace_label(0x00000001)
+    'UNKNOWN'
+    >>> guess_namespace_label(0xffef1234)
+    'UNKNOWN'
+    >>> guess_namespace_label(0xeeeeffff)
+    'DVB-T'
+    """
+    v_low = value & 0xffff
+    value = (value >> 0x10) & 0xffff
+    if value == 0:
+        value = v_low
+
+    try:
+        return NS_LOOKUP[value]
+    except KeyError:
+        return fallback
 
 
 def normalise_servicereference(serviceref):
