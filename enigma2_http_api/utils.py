@@ -93,6 +93,7 @@ LISTING_ITEM_KEY_PAIRS = [
     ('title', 'longdesc'),
     ('name', 'descriptionextended'),
     ('eventname', 'description'),
+    ('title', 'longinfo'),
 ]
 
 # sondern Magnums Leben in Gefahr... 47 Min.
@@ -359,17 +360,21 @@ def pseudo_unique_id(item):
     '7a6615ef8ca6b06ac6a837741293759d3083a49c'
     """
 
-    (name, desc) = None, None
-    for name_key, desc_key in LISTING_ITEM_KEY_PAIRS:
-        try:
-            (name, desc) = item[name_key], item[desc_key]
-            if desc is not None and desc.strip():
-                break
-        except KeyError:
-            pass
+    try:
+        (name, desc) = getattr(item, 'title'), getattr(item, 'longinfo')
+    except AttributeError:
+        (name, desc) = None, None
+        for name_key, desc_key in LISTING_ITEM_KEY_PAIRS:
+            try:
+                (name, desc) = item[name_key], item[desc_key]
+                if desc is not None and desc.strip():
+                    break
+            except KeyError:
+                pass
 
     if None in (name, desc):
         raise AssertionError("name or desc may not be None")
+
     if '' in (name.strip(), desc.strip()):
         raise AssertionError("name or desc may not be empty")
 
