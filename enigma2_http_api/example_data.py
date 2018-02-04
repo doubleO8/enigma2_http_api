@@ -14,6 +14,19 @@ example_epg = {
     'title': u'Orange is the New Black'
 }
 
+example_epg_ee = {
+    '_type': 'epg',
+    '_kind': 'EEvent',
+    'duration': 3300,
+    'start_time': '2017-08-24 22:15:00',
+    'title': u'Orange is the New Black',
+    'item_id': 22997,
+    'service_name': 'zdf_neo',
+    'longinfo': u'',
+    'shortinfo': u'Muss ich wirklich dazwischen?',
+    'service_reference': '1:0:1:6d6e:437:66:ffff0000:0:0:0:'
+}
+
 example_timer = {
     'begin': 1503612600,
 
@@ -84,4 +97,17 @@ expected_radio = {
     'item_id': 6784,
     'service_name': 'DASDING',
     'service_reference': '1:0:1:6d6e:437:66:ffff0000:0:0:0:'
+}
+
+example_timer_radio_ee = {
+    '_type': 'timer',
+    '_kind': 'EEvent',
+    'duration': 7800,
+    'start_time': '2017-09-07 18:55:00',
+    'title': 'DASDING Sprechstunde',
+    'item_id': 6784,
+    'service_name': 'DASDING',
+    'longinfo': u'N/A',
+    'shortinfo': '',
+    'service_reference': '1:0:2:6f37:431:a401:ffff0000:0:0:0:'
 }

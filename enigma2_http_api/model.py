@@ -23,6 +23,8 @@ DEFAULT_LOCALTIMEZONE = "Europe/Berlin"
 #: items returned by enigma2 API
 DT_FORMAT__REAL__KEYS = '%d.%m.%Y %H:%M'
 
+DT_FORMAT__PLAIN = "%Y-%m-%d %H:%M:%S"
+
 ID = 1
 START_TIMESTAMP = 2
 STOP_TIMESTAMP = 3
@@ -171,6 +173,15 @@ class EEvent(dict):
         '1:0:2:6f37:431:a401:ffff0000:0:0:0:6784'
         >>> timer_r.pseudo_id
         '9c357fbab2a36d905a9c2658eac6c11df1d23a85'
+        >>> from example_data import example_timer_radio_ee, example_epg_ee
+        >>> timer_r.plain_dict() == example_timer_radio_ee
+        True
+        >>> timer_r.plain_dict() == EEvent(example_timer_radio_ee).plain_dict()
+        True
+        >>> epg_d.plain_dict() == example_epg_ee
+        True
+        >>> epg_d.plain_dict() == EEvent(example_epg_ee).plain_dict()
+        True
         """
         dict.__init__(self, *args, **kwargs)
         if kwargs.get("timezone") is None:
@@ -187,7 +198,16 @@ class EEvent(dict):
 
         return self.timezone.localize(dt_obj)
 
-    def _init_attributes(self):
+    def _init_attributes_plain_dict(self):
+        for key in _METAMAP_ATTRIBUTES:
+            setattr(self, key, self[key])
+        self._type = self['_type']
+        self.duration = datetime.timedelta(seconds=self['duration'])
+        self.start_time = pytz.utc.localize(
+            datetime.datetime.strptime(self['start_time'], DT_FORMAT__PLAIN))
+        self.stop_time = self.start_time + self.duration
+
+    def _init_attributes_enigma(self):
         if 'duration_sec' in self:
             self._type = ITEM_TYPE_EPG
         elif 'recordingtime' in self:
@@ -229,10 +249,15 @@ class EEvent(dict):
         else:
             raise ValueError("Unsupported type {!r}".format(self._type))
 
+    def _init_attributes(self):
+        if self.get('_kind') == 'EEvent':
+            self._init_attributes_plain_dict()
+        else:
+            self._init_attributes_enigma()
+            self.longinfo = self.longinfo.replace(u"\u008a", "\n")
+
         psr = parse_servicereference(self.service_reference)
         self.service_reference = create_servicereference(psr)
-
-        self.longinfo = self.longinfo.replace(u"\u008a", "\n")
 
         is_radio = (psr['service_type'] == SERVICE_TYPE_RADIO)
 
@@ -258,6 +283,20 @@ class EEvent(dict):
             self.item_id, self.start_time.strftime('%Y-%m-%d %H:%M %z %Z'),
             self.title, self.shortinfo)
 
+    def plain_dict(self):
+        return {
+            '_kind': 'EEvent',
+            '_type': self._type,
+            'item_id': self.item_id,
+            'service_name': self.service_name,
+            'service_reference': self.service_reference,
+            'title': self.title,
+            'shortinfo': self.shortinfo,
+            'longinfo': self.longinfo,
+            'duration': self.duration.seconds,
+            'start_time': self.start_time.astimezone(pytz.utc).strftime(
+                DT_FORMAT__PLAIN)
+        }
 
 if __name__ == '__main__':
     import doctest
