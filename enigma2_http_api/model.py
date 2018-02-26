@@ -10,7 +10,7 @@ import datetime
 import pytz
 
 from utils import parse_servicereference, create_servicereference
-from utils import pseudo_unique_id_any, pseudo_unique_id_radio
+from utils import pseudo_unique_id_any
 from utils import SERVICE_TYPE_RADIO
 
 #: default/fallback value for local timezone
@@ -99,6 +99,8 @@ _META_MAP = {
 }
 
 EVENT_HEADER_FMT = u'{start_time} -- {stop_time} #{item_id:06d} {service_name}'
+EVENT_HEADER_TECH_FMT = u'{start_time} -- {stop_time} #{item_id:06d} ' \
+                        u'{service_name:30} {service_reference}'
 EVENT_TITLE_FMT = u'{title}{shortinfo}'
 EVENT_BODY_FMT = u'{duration} {longinfo}'
 EVENT_PSEUDO_ID_FMT = u'PSEUDO ID: {pseudo_id}'
