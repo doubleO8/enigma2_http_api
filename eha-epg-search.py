@@ -3,7 +3,6 @@
 import pprint
 import logging
 import argparse
-import datetime
 
 import pytz
 
@@ -15,6 +14,7 @@ from enigma2_http_api.utils import set_output_encoding
 from enigma2_http_api.utils import SERVICE_TYPE_TV, SERVICE_TYPE_HDTV
 from enigma2_http_api.model import EVENT_HEADER_FMT, EVENT_TITLE_FMT
 from enigma2_http_api.model import EVENT_BODY_FMT
+from enigma2_http_api.model import EVENT_HEADER_TECH_FMT
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -34,15 +34,23 @@ class EPGSearch(Enigma2APIController):
         set_output_encoding()
 
         for item in self.search(self.args.search_query):
-            print(EVENT_HEADER_FMT.format(
+            fmt = EVENT_HEADER_FMT
+            args = dict(
                 item_id=item.item_id, service_name=item.service_name,
                 start_time=item.start_time.strftime('%d.%m.%Y %H:%M'),
                 stop_time=item.stop_time.strftime('%H:%M'),
-            ))
+            )
+            if self.args.tech_mode:
+                fmt = EVENT_HEADER_TECH_FMT
+                # psr = parse_servicereference(item.service_reference)
+                args['service_reference'] = item.service_reference
+
+            print(fmt.format(**args))
             print(EVENT_TITLE_FMT.format(
                 title=item.title,
                 shortinfo=(
-                item.shortinfo and u' - {:s}'.format(item.shortinfo) or "")))
+                    item.shortinfo and u' - {:s}'.format(
+                        item.shortinfo) or "")))
             if self.args.verbose > 0:
                 print(EVENT_BODY_FMT.format(
                     duration='{:d} mins.'.format(item.duration.seconds / 60),
@@ -74,14 +82,15 @@ class EPGSearch(Enigma2APIController):
                                                self.lookup_map[key]))
 
     def filter_search_results(self, data):
+        if (self.args.verbose or self.args.tech_mode) and data:
+            self.log.info("Filtering {:d} result(s)".format(len(data)))
+
         for item in data:
-            if self.args.verbose > 9:
+            if self.args.verbose > 1:
                 pprint.pprint(item)
 
             del item['picon']
 
-            if self.args.verbose > 9:
-                pprint.pprint(item)
             yield item
 
     def search(self, what):
@@ -118,6 +127,9 @@ if __name__ == '__main__':
     argparser.add_argument('--dry-run', '-n', action='store_true',
                            dest="dry_run",
                            help="dry run mode", default=False)
+    argparser.add_argument('--technical', '-t', action='store_true',
+                           dest="tech_mode",
+                           help="dump more technical details", default=False)
     argparser.add_argument('--verbose', '-v', action='count',
                            default=0, dest="verbose",
                            help="verbosity (more v: more verbosity)")
