@@ -9,6 +9,8 @@ import codecs
 import requests
 
 from model import EEvent
+from utils import parse_servicereference, NORMALISED_SERVICEREFERENCE_FMT
+from utils import create_servicereference
 
 #: enigma2 web interface URL format string
 ENIGMA2_URL_FMT = '{scheme}://{remote_addr}/{path}'
@@ -48,7 +50,8 @@ class BlacklistController(object):
         self.log = logging.getLogger(__name__)
         self.blacklist = dict()
         self._blacklist_path = None
-        self._pseudo_id_none_warnings = kwargs.get("pseudo_id_none_warnings", True)
+        self._pseudo_id_none_warnings = kwargs.get("pseudo_id_none_warnings",
+                                                   True)
 
         if kwargs.get("blacklist_path"):
             self._blacklist_path = kwargs.get("blacklist_path")
@@ -499,6 +502,35 @@ class Enigma2APIController(BlacklistController):
             return ''
 
         return self._apicall('messageanswer', params=params)
+
+
+class ServiceLookupController(object):
+    def __init__(self, *args, **kwargs):
+        self._lookup = dict()
+        self._servicename_lookup = dict()
+
+        if len(args) == 1:
+            self.update_raw(args[0])
+
+    def __getitem__(self, key):
+        return self._servicename_lookup[key]
+
+    def update_raw(self, getallservices_result):
+        for item in getallservices_result:
+            for sub in item.get("subservices", []):
+                psref = parse_servicereference(sub['servicereference'])
+                if psref['oid'] == psref['tsid'] == psref['sid'] == psref[
+                    'ns'] == 0:
+                    continue
+                nrm_servicereference = NORMALISED_SERVICEREFERENCE_FMT.format(
+                    **psref)
+                service_tuple = (sub['servicename'], psref['ns'])
+                self._lookup[nrm_servicereference] = service_tuple
+
+                self._servicename_lookup[service_tuple] = psref
+
+    def lookup_service(self, servicename, ns):
+        return create_servicereference(self[(servicename, ns)])
 
 
 if __name__ == '__main__':

@@ -95,7 +95,8 @@ class PseudoIDTestCase(unittest.TestCase):
         self.assertEqual(datetime.timedelta(0, 7787), events[1].duration)
         self.assertEqual(6059448549813246681, events[1].item_id)
         self.assertEqual('SPUTNIK Black Beatz - Wiederholung', events[1].title)
-        self.assertTrue(events[1].longinfo.startswith("Feinster R'n'B, tighter"))
+        self.assertTrue(events[1].longinfo.startswith(
+            "Feinster R'n'B, tighter"))
 
         self.assertEqual("2017-08-30_16:50",
                          events[2].start_time.strftime("%Y-%m-%d_%H:%M"))

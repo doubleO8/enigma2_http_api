@@ -1,0 +1,38 @@
+[
+  {
+   "servicereference": "1:7:1:0:0:0:0:0:0:0:FROM BOUQUET \"userbouquet.a.tv\" ORDER BY bouquet",
+   "subservices": [
+    {
+     "servicereference": "1:0:19:7C:6:85:FFFF0000:0:0:0:", 
+     "program": 124, 
+     "servicename": "Fox HD (S)", 
+     "pos": 1
+    }, 
+    {
+     "servicereference": "1:0:19:6E:D:85:FFFF0000:0:0:0:", 
+     "program": 110, 
+     "servicename": "Sky Atlantic HD", 
+     "pos": 8
+    }, 
+    {
+     "servicereference": "1:0:1:22:1:85:FFFF0000:0:0:0:", 
+     "program": 34, 
+     "servicename": "Sky Atlantic", 
+     "pos": 37
+    }
+   ], 
+   "servicename": "alpha"
+  }, 
+  {
+   "servicereference": "1:7:1:0:0:0:0:0:0:0:FROM BOUQUET \"userbouquet.b.tv\" ORDER BY bouquet",
+   "subservices": [
+    {
+     "servicereference": "1:0:19:6E:D:85:C00000:0:0:0:", 
+     "program": 110, 
+     "servicename": "Sky Atlantic HD", 
+     "pos": 358
+    }
+   ],
+   "servicename": "beta"
+  }
+ ]
