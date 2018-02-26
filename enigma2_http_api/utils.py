@@ -96,6 +96,8 @@ LISTING_ITEM_KEY_PAIRS = [
     ('title', 'longinfo'),
 ]
 
+NORMALISED_SERVICEREFERENCE_FMT = '{service_type:04X}:{sid:04X}:{tsid:04X}:{oid:04X}:{ns:08X}'
+
 # sondern Magnums Leben in Gefahr... 47 Min.
 PATTERN_RUNLENGTH = r'\s\d+\sMin\.'
 RE_RUNLENGTH = re.compile(PATTERN_RUNLENGTH)
@@ -164,8 +166,7 @@ def normalise_servicereference(serviceref):
     '000A:0000:0000:0000:00000000'
     """
     psref = parse_servicereference(serviceref)
-    return '{service_type:04X}:{sid:04X}:{tsid:04X}:{oid:04X}:{ns:08X}'.format(
-        **psref)
+    return NORMALISED_SERVICEREFERENCE_FMT.format(**psref)
 
 
 def parse_servicereference(serviceref):
