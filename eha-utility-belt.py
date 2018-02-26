@@ -41,6 +41,8 @@ class UtilityBelt(Enigma2APIController):
         elif self.args.mode.startswith(API_CALL_PREFIX):
             api_call = self.args.mode.replace(API_CALL_PREFIX, '')
             self.dump_api_result(api_call)
+        elif self.args.zap_to_service:
+            self.zap(self.args.zap_to_service)
         else:
             try:
                 getattr(self, self.args.mode)()
@@ -127,6 +129,9 @@ if __name__ == '__main__':
                           help='Dump result of REST supported check',
                           action='store_const', const='dump_has_rest_result',
                           default='about', dest="mode")
+    group_op.add_argument('--zap', dest="zap_to_service",
+                           default=None,
+                           help="ZAP to Service")
 
     group_ac = argparser.add_argument_group('Miscellaneous API calls')
     api_calls = [
