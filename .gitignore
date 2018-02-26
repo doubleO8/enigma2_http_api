@@ -1,6 +1,6 @@
 /.idea/
 *~
-*.pyc
+*.py[cod]
 
 /MANIFEST
 /dist/
@@ -8,3 +8,4 @@
 /*.egg-info
 
 /doc/build/
+/build
