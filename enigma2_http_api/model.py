@@ -279,7 +279,7 @@ class EEvent(dict):
         )
 
     def __repr__(self):
-        return '<{:s} {!r} {:s}#{:06d}> {:s} {!r} {!r}'.format(
+        return '<{:s} {!r} {!r}#{:06d}> {:s} {!r} {!r}'.format(
             self.__class__.__name__, self._type,
             self.service_name,
             self.item_id, self.start_time.strftime('%Y-%m-%d %H:%M %z %Z'),
