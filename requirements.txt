@@ -1,2 +1,4 @@
 pytz>=2012c
 requests>=2.4.3
+future==0.18.2
+six==1.14.0
