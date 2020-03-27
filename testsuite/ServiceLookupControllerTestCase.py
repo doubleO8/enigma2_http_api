@@ -25,7 +25,7 @@ class ServiceLookupControllerTestCase(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             self.slc["Sky Atlantic HD"]
 
-        self.assertTrue('Sky Atlantic HD' in context.exception)
+        self.assertTrue('Sky Atlantic HD' in str(context.exception))
 
     def testDictLikeLookupTuples(self):
         result = self.slc.lookup_service('Sky Atlantic HD', NS_DVB_C)
@@ -37,7 +37,7 @@ class ServiceLookupControllerTestCase(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             self.slc.lookup_service("Sky Atlantic HD", NS_DVB_T)
 
-        self.assertTrue(("Sky Atlantic HD", NS_DVB_T) in context.exception)
+        self.assertEqual("('Sky Atlantic HD', 4008574976)", str(context.exception))
 
 
 if __name__ == '__main__':
