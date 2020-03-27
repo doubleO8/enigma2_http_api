@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import sys
 import os
 import pprint
@@ -46,12 +47,12 @@ def demo_list_timers():
     dump_keys = ['begin', 'end', 'startprepare', 'realbegin', 'realend']
     for item in timerlist:
         for key in dump_keys:
-            print "{:s}: {!s}".format(key, item[key])
+            print("{:s}: {!s}".format(key, item[key]))
             try:
                 dt_obj = datetime.datetime.fromtimestamp(item[key])
                 if dt_obj.tzinfo is None:
                     dt_obj = LOCALTIMEZONE.localize(dt_obj)
-                print ' ({!s})'.format(dt_obj.strftime('%Y-%m-%d %H:%M %z %Z'))
+                print(' ({!s})'.format(dt_obj.strftime('%Y-%m-%d %H:%M %z %Z')))
             except TypeError:
                 pass
         pprint.pprint(item)
@@ -80,7 +81,7 @@ if __name__ == '__main__':
     if not REMOTE_ADDR:
         sys.exit(-1)
     DUMP_REQUESTS = tempfile.mkdtemp()
-    print "REMOTE_ADDR={!s}, DUMP_REQUESTS={!s}".format(REMOTE_ADDR, DUMP_REQUESTS)
+    print("REMOTE_ADDR={!s}, DUMP_REQUESTS={!s}".format(REMOTE_ADDR, DUMP_REQUESTS))
     EAC = Enigma2APIController(remote_addr=REMOTE_ADDR, dump_requests=DUMP_REQUESTS)
 
     demo_search()
@@ -91,4 +92,4 @@ if __name__ == '__main__':
     demo_list_timers()
     demo_movielist()
     # demo_zap_and_list_epg()
-    print "REMOTE_ADDR={!s}, DUMP_REQUESTS={!s}".format(REMOTE_ADDR, DUMP_REQUESTS)
+    print("REMOTE_ADDR={!s}, DUMP_REQUESTS={!s}".format(REMOTE_ADDR, DUMP_REQUESTS))

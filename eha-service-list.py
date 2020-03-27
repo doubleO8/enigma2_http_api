@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import logging
 import sys
 import os
@@ -87,7 +88,7 @@ class ServiceLister(Enigma2APIController):
 
                 self.lookup_map[sref] = res
 
-        for key in sorted(self.lookup_map.keys(),
+        for key in sorted(list(self.lookup_map.keys()),
                           key=lambda x: normalise_servicereference(x)):
             self.log.debug("{:s}> {!r}".format(normalise_servicereference(key),
                                                self.lookup_map[key]))
@@ -101,7 +102,7 @@ class ServiceLister(Enigma2APIController):
 
             return [x[1] for x in sorted(meta)]
         else:
-            return sorted(self.lookup_map.keys(),
+            return sorted(list(self.lookup_map.keys()),
                           key=lambda x: normalise_servicereference(x))
 
     def list(self):
@@ -110,13 +111,13 @@ class ServiceLister(Enigma2APIController):
             sref = parse_servicereference(item['servicereference'])
             self.log.debug("{:s}> {!r}".format(normalise_servicereference(key),
                                                self.lookup_map[key]))
-            print '0x{oid:04X} {service_type:5s} {namespace:5s} {servicename:50s} {sref}'.format(
+            print('0x{oid:04X} {service_type:5s} {namespace:5s} {servicename:50s} {sref}'.format(
                 oid=sref['oid'],
                 service_type=SERVICE_TYPE_LOOKUP[sref['service_type']],
                 namespace=NS_LOOKUP[sref['ns']],
                 servicename=item['servicename'].encode('utf-8'),
                 sref=item['servicereference']
-            )
+            ))
 
     def dump(self):
         data = {

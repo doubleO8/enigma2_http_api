@@ -1,12 +1,17 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import division
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from past.utils import old_div
 import logging
 import sys
 import os
 import argparse
 import datetime
 import pprint
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import pytz
 
 from enigma2_http_api.defaults import REMOTE_ADDR
@@ -41,9 +46,9 @@ class TimerLister(Enigma2APIController):
                 item.shortinfo and u' - {:s}'.format(item.shortinfo) or "")))
             if self.args.verbose > 0:
                 print(EVENT_BODY_FMT.format(
-                    duration='{:d} mins.'.format(item.duration.seconds / 60),
+                    duration='{:d} mins.'.format(old_div(item.duration.seconds, 60)),
                     longinfo=item.longinfo))
-            print " "
+            print(" ")
 
             if self.args.verbose > 1:
                 print(EVENT_PSEUDO_ID_FMT.format(pseudo_id=item.pseudo_id))
@@ -54,13 +59,13 @@ class TimerLister(Enigma2APIController):
                 }
                 del_url = 'http://{remote_addr}/api/timerdelete?{query}'.format(
                     remote_addr=self.args.remote_addr,
-                    query=urllib.urlencode(query_params))
+                    query=urllib.parse.urlencode(query_params))
                 print("Delete URL: {:s}".format(del_url))
 
             if self.args.verbose > 2:
                 pprint.pprint(item)
 
-            print " "
+            print(" ")
 
 
 if __name__ == '__main__':

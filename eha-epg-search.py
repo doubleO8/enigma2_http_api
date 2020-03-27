@@ -1,5 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import division
+from __future__ import print_function
+from past.utils import old_div
 import pprint
 import logging
 import argparse
@@ -53,12 +56,12 @@ class EPGSearch(Enigma2APIController):
                         item.shortinfo) or "")))
             if self.args.verbose > 0:
                 print(EVENT_BODY_FMT.format(
-                    duration='{:d} mins.'.format(item.duration.seconds / 60),
+                    duration='{:d} mins.'.format(old_div(item.duration.seconds, 60)),
                     longinfo=item.longinfo))
-            print " "
+            print(" ")
             if self.args.verbose > 2:
                 pprint.pprint(item)
-            print " "
+            print(" ")
 
     def _update_lookup_map(self):
         st = (SERVICE_TYPE_TV, SERVICE_TYPE_HDTV)
@@ -76,7 +79,7 @@ class EPGSearch(Enigma2APIController):
 
                 self.lookup_map[sref] = val
 
-        for key in sorted(self.lookup_map.keys(),
+        for key in sorted(list(self.lookup_map.keys()),
                           key=lambda x: normalise_servicereference(x)):
             self.log.debug("{:s}> {!r}".format(normalise_servicereference(key),
                                                self.lookup_map[key]))
@@ -114,7 +117,7 @@ class EPGSearch(Enigma2APIController):
 
         try:
             parse_servicereference(zap_to)
-        except Exception, pexc:
+        except Exception as pexc:
             self.log.error("Invalid service reference! {!r}".format(pexc))
             return False
 

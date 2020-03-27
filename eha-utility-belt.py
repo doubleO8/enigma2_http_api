@@ -46,7 +46,7 @@ class UtilityBelt(Enigma2APIController):
         else:
             try:
                 getattr(self, self.args.mode)()
-            except AttributeError, aexception:
+            except AttributeError as aexception:
                 self.log.error("Ha! Unsupported: {!r}".format(aexception))
 
     def about(self):
@@ -74,7 +74,7 @@ class UtilityBelt(Enigma2APIController):
 
                 self.lookup_map[sref] = val
 
-        for key in sorted(self.lookup_map.keys(),
+        for key in sorted(list(self.lookup_map.keys()),
                           key=lambda x: normalise_servicereference(x)):
             self.log.debug("{:s}> {!r}".format(normalise_servicereference(key),
                                                self.lookup_map[key]))
@@ -97,7 +97,7 @@ class UtilityBelt(Enigma2APIController):
 
         try:
             parse_servicereference(zap_to)
-        except Exception, pexc:
+        except Exception as pexc:
             self.log.error("Invalid service reference! {!r}".format(pexc))
             return False
 
