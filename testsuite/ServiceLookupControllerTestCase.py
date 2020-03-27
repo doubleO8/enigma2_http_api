@@ -17,7 +17,7 @@ TD = os.path.abspath(
 class ServiceLookupControllerTestCase(unittest.TestCase):
     def setUp(self):
         filename = os.path.join(TD, "getallservices.json")
-        with open(filename, "rb") as src:
+        with open(filename, "r") as src:
             data = json.load(src)
         self.slc = ServiceLookupController(data)
 

@@ -22,7 +22,7 @@ class PseudoIDTestCase(unittest.TestCase):
     maxDiff = None
 
     def _load_raw(self, filename):
-        with open(filename, "rb") as src:
+        with open(filename, "r") as src:
             data = json.load(src)
         return data
 
