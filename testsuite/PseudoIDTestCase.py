@@ -7,6 +7,8 @@ import unittest
 import glob
 import datetime
 
+import six
+
 sys.path.insert(0, '..')
 
 from enigma2_http_api.utils import pseudo_unique_id, SERVICE_TYPE_RADIO
@@ -87,13 +89,21 @@ class PseudoIDTestCase(unittest.TestCase):
         self.assertEqual("2017-09-21_20:55",
                          events[0].start_time.strftime("%Y-%m-%d_%H:%M"))
         self.assertEqual(datetime.timedelta(0, 7778), events[0].duration)
-        self.assertEqual(2962768356996390958, events[0].item_id)
+        if six.PY2:
+            self.assertEqual(2962768356996390958, events[0].item_id)
+        else:
+            expectation = '1:0:0:0:0:0:00000000:0:0:0:'
+            self.assertEqual(expectation, events[0].service_reference)
         self.assertEqual(None, events[0].pseudo_id)
 
         self.assertEqual("2017-09-17_23:55",
                          events[1].start_time.strftime("%Y-%m-%d_%H:%M"))
         self.assertEqual(datetime.timedelta(0, 7787), events[1].duration)
-        self.assertEqual(6059448549813246681, events[1].item_id)
+        if six.PY2:
+            self.assertEqual(6059448549813246681, events[1].item_id)
+        else:
+            expectation = '1:0:0:0:0:0:00000000:0:0:0:'
+            self.assertEqual(expectation, events[1].service_reference)
         self.assertEqual('SPUTNIK Black Beatz - Wiederholung', events[1].title)
         self.assertTrue(events[1].longinfo.startswith(
             "Feinster R'n'B, tighter"))
@@ -102,7 +112,11 @@ class PseudoIDTestCase(unittest.TestCase):
                          events[2].start_time.strftime("%Y-%m-%d_%H:%M"))
         self.assertEqual(datetime.timedelta(), events[2].duration)
         self.assertEqual(events[2].start_time, events[2].stop_time)
-        self.assertEqual(-5676678663366908110, events[2].item_id)
+        if six.PY2:
+            self.assertEqual(-5676678663366908110, events[2].item_id)
+        else:
+            expectation = '1:0:0:0:0:0:00000000:0:0:0:'
+            self.assertEqual(expectation, events[2].service_reference)
 
         for item in events[1:]:
             self.assertEqual(pseudo_unique_id(item), item.pseudo_id)
