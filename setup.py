@@ -14,10 +14,18 @@ setup(
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description='enigma2 HTTP API client library',
-    long_description="enigma2_http_api's main goal is providing a thin wrapper library for the Enigma2 WebInterface. Using the library may help controlling enigma2 based STBs either from the enigma2 device itself or from a remote host.",
+    long_description="enigma2_http_api's main goal is providing a thin wrapper"
+                     " library for the Enigma2 WebInterface. Using the library"
+                     " may help controlling enigma2 based STBs either from "
+                     "the enigma2 device itself or from a remote host.",
     url="https://github.com/doubleO8/enigma2_http_api",
     packages=['enigma2_http_api'],
-    install_requires=['pytz', 'requests'],
+    install_requires=[
+        'pytz',
+        'requests',
+        'future==0.18.2',
+        'six==1.14.0'
+    ],
     scripts=[
         'eha-movie-list.py',
         'eha-timer-list.py',
