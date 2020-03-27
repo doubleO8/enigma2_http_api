@@ -11,6 +11,7 @@
     * http://radiovibrations.com/dreambox/services.htm
 
 """
+from __future__ import print_function
 import os
 import datetime
 import hashlib
@@ -48,7 +49,7 @@ SERVICE_TYPE = {
     'OPT': SERVICE_TYPE_OPT,
 }
 
-SERVICE_TYPE_LOOKUP = {v: k for k, v in SERVICE_TYPE.iteritems()}
+SERVICE_TYPE_LOOKUP = {v: k for k, v in SERVICE_TYPE.items()}
 
 NS_DVB_S_ASTRA = 192 << 16  # 0x00c00000
 NS_DVB_S_HOTBIRD = 130 << 16  # 0x00820000

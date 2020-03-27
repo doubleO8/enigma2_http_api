@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import object
 import os
 import logging
 import pprint
@@ -8,9 +11,9 @@ import codecs
 
 import requests
 
-from model import EEvent
-from utils import parse_servicereference, NORMALISED_SERVICEREFERENCE_FMT
-from utils import create_servicereference
+from .model import EEvent
+from .utils import parse_servicereference, NORMALISED_SERVICEREFERENCE_FMT
+from .utils import create_servicereference
 
 #: enigma2 web interface URL format string
 ENIGMA2_URL_FMT = '{scheme}://{remote_addr}/{path}'
@@ -74,7 +77,7 @@ class BlacklistController(object):
                         filename, len(data)))
 
             self.blacklist.update(data)
-        except IOError, ierr:
+        except IOError as ierr:
             self.log.warning('%s',
                              "Failed to load blacklist data {!r}: {!s}".format(
                                  filename, ierr))
@@ -147,7 +150,7 @@ class Enigma2APIController(BlacklistController):
         self._request_no += 1
         try:
             return requests.get(url, **kwargs)
-        except Exception, exc:
+        except Exception as exc:
             self.log.error(
                 "Error GETting {!s}: No JSON result? {!s}".format(url, exc))
             raise
@@ -197,7 +200,7 @@ class Enigma2APIController(BlacklistController):
         if self.dump_requests:
             try:
                 self._dump_request(req, filter_key)
-            except Exception, exc:
+            except Exception as exc:
                 self.log.warning('%s',
                                  "Request dumping failed: {!r}".format(exc))
 
@@ -223,7 +226,7 @@ class Enigma2APIController(BlacklistController):
                 'Access-Control-Allow-Headers',
             ]
             expected_headers_set = set([x.lower() for x in expected_headers])
-            headers_set = set([x.lower() for x in req.headers.keys()])
+            headers_set = set([x.lower() for x in list(req.headers.keys())])
             result = (
                 len(expected_headers) == len(expected_headers_set & headers_set)
             )
@@ -541,8 +544,8 @@ if __name__ == '__main__':
     if not REMOTE_ADDR:
         sys.exit(-1)
     DUMP_REQUESTS = tempfile.mkdtemp()
-    print "REMOTE_ADDR={!s}, DUMP_REQUESTS={!s}".format(REMOTE_ADDR,
-                                                        DUMP_REQUESTS)
+    print("REMOTE_ADDR={!s}, DUMP_REQUESTS={!s}".format(REMOTE_ADDR,
+                                                        DUMP_REQUESTS))
     EAC = Enigma2APIController(remote_addr=REMOTE_ADDR,
                                dump_requests=DUMP_REQUESTS)
     EAC.get_services()

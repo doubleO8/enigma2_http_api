@@ -5,13 +5,15 @@ Model classes and constants.
 ----------------------------
 
 """
+from __future__ import print_function
+from __future__ import absolute_import
 import datetime
 
 import pytz
 
-from utils import parse_servicereference, create_servicereference
-from utils import pseudo_unique_id_any
-from utils import SERVICE_TYPE_RADIO
+from .utils import parse_servicereference, create_servicereference
+from .utils import pseudo_unique_id_any
+from .utils import SERVICE_TYPE_RADIO
 
 #: default/fallback value for local timezone
 #: as the enigma2 API returns localised timestamps (not UTC!) one need to set
@@ -49,7 +51,7 @@ _METAMAP_ATTR_REV = {
     STOP_TIMESTAMP: 'stop_time',
 }
 
-for k, v in _METAMAP_ATTRIBUTES.items():
+for k, v in list(_METAMAP_ATTRIBUTES.items()):
     if v is not None:
         _METAMAP_ATTR_REV[v] = k
 
